@@ -89,6 +89,8 @@ erDiagram
 - `IndigoAssistsMVC/IndigoAssits.API/README.md` (endpoints y configuracion)
 - `IndigoAssistsMAUI/README.md` (app MAUI y API externa)
 - `Documentacion/Diagrama de clases.drawio.pdf`
+- `INSTALL.md` (manual de instalacion)
+- `USAGE.md` (manual de uso MVC y MAUI)
 
 ## Diagrama de clases
 
