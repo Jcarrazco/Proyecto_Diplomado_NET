@@ -20,7 +20,7 @@ flowchart LR
   MVC[IndigoAssist MVC] -->|HTTP| API[IndigoAssist API]
   API -->|Tickets + Activos| INDIGO[(Indigo legacy)]
   API -->|Identity| BASIC[(IndigoBasic)]
-  MAUI[ActivosApp MAUI] -->|HTTP + JWT| API_MAUI[Activos API externa]
+  MAUI[ActivosApp MAUI] -->|HTTP + JWT| API[IndigoAssist API]
 ```
 
 Notas:
