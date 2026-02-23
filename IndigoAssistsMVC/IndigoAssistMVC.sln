@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36408.4
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IndigoAsists.Repositorio", "IndigoAsists.Repositorio\IndigoAsists.Repositorio.csproj", "{D07E40A8-A262-4B9C-A8A6-EE03720F9364}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IndigoAssits.Core", "IndigoAssits.Core\IndigoAssits.Core.csproj", "{A64F32B4-707C-449A-B97E-4B27DD5FA065}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IndigoAssits.Repositorio.Core", "IndigoAssits.Repositorio.Core\IndigoAssits.Repositorio.Core.csproj", "{D2392C3F-6132-4613-B5ED-CF54E3C4E57F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IndigoAssitsReglasDeNegocio", "IndigoAssitsReglasDeNegocio\IndigoAssitsReglasDeNegocio.csproj", "{B5D5CB75-A5A0-4968-A650-7B7A51DE9F9C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IndigoAssistMVC", "IndigoAssistMVC\IndigoAssistMVC.csproj", "{65132AE3-55F2-647F-9096-1941407915A4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IndigoAssits.API", "IndigoAssits.API\IndigoAssits.API.csproj", "{FEAD11DC-CE5E-021D-39D9-DE2C1E903B15}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D07E40A8-A262-4B9C-A8A6-EE03720F9364}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D07E40A8-A262-4B9C-A8A6-EE03720F9364}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D07E40A8-A262-4B9C-A8A6-EE03720F9364}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D07E40A8-A262-4B9C-A8A6-EE03720F9364}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A64F32B4-707C-449A-B97E-4B27DD5FA065}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A64F32B4-707C-449A-B97E-4B27DD5FA065}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A64F32B4-707C-449A-B97E-4B27DD5FA065}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A64F32B4-707C-449A-B97E-4B27DD5FA065}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2392C3F-6132-4613-B5ED-CF54E3C4E57F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2392C3F-6132-4613-B5ED-CF54E3C4E57F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2392C3F-6132-4613-B5ED-CF54E3C4E57F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2392C3F-6132-4613-B5ED-CF54E3C4E57F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5D5CB75-A5A0-4968-A650-7B7A51DE9F9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5D5CB75-A5A0-4968-A650-7B7A51DE9F9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5D5CB75-A5A0-4968-A650-7B7A51DE9F9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5D5CB75-A5A0-4968-A650-7B7A51DE9F9C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65132AE3-55F2-647F-9096-1941407915A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65132AE3-55F2-647F-9096-1941407915A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65132AE3-55F2-647F-9096-1941407915A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65132AE3-55F2-647F-9096-1941407915A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FEAD11DC-CE5E-021D-39D9-DE2C1E903B15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FEAD11DC-CE5E-021D-39D9-DE2C1E903B15}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FEAD11DC-CE5E-021D-39D9-DE2C1E903B15}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FEAD11DC-CE5E-021D-39D9-DE2C1E903B15}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A1AAA8FF-444F-44C9-BD2F-81F16A30F6C5}
+	EndGlobalSection
+EndGlobal

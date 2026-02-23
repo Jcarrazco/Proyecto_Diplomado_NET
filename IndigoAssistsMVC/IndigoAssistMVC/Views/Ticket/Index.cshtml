@@ -1,0 +1,427 @@
+@model TicketDashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard de Tickets";
+    var usuario = Context.Session.GetString("NombreCompleto");
+    var login = Context.Session.GetString("Login");
+    var legacyMissing = ViewBag.LegacyMissing as bool? == true;
+}
+
+<div class="container-fluid">
+    <!-- Header del Dashboard -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">Dashboard de Tickets</h1>
+                    <p class="text-muted mb-0">Bienvenido, @usuario (@login)</p>
+                </div>
+                <div>
+                    <form asp-controller="Usuario" asp-action="Logout" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-outline-danger">
+                            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (legacyMissing)
+    {
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="alert alert-warning" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Este usuario no existe en el sistema legacy de tickets. Si necesitas acceso, solicita el alta en mEmpleados.
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Estadísticas Generales -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">@Model.Estadisticas.TotalAbiertos</h4>
+                            <p class="card-text">Tickets Abiertos</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-folder-open fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">@Model.Estadisticas.TotalEnProceso</h4>
+                            <p class="card-text">En Proceso</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-cogs fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">@Model.Estadisticas.TotalAsignados</h4>
+                            <p class="card-text">Asignados a Mí</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-user-check fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">@Model.Estadisticas.TotalCerrados</h4>
+                            <p class="card-text">Cerrados</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-check-circle fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navegación Rápida -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Acceso Rápido</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <a asp-action="TicketsAbiertosDepto" class="btn btn-outline-primary btn-block">
+                                <i class="fas fa-folder-open"></i> Tickets Abiertos
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a asp-action="TicketsEnProcesoDepto" class="btn btn-outline-warning btn-block">
+                                <i class="fas fa-cogs"></i> En Proceso
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a asp-action="TicketsAsignados" class="btn btn-outline-info btn-block">
+                                <i class="fas fa-user-check"></i> Mis Tickets
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a asp-action="TicketsCerradosDepto" class="btn btn-outline-success btn-block">
+                                <i class="fas fa-check-circle"></i> Cerrados
+                            </a>
+                        </div>
+                        @if (User.IsInRole("Administrador"))
+                        {
+                            <div class="col-md-3 mb-2">
+                                <a asp-action="TicketsTodos" class="btn btn-outline-dark btn-block">
+                                    <i class="fas fa-layer-group"></i> Todos los Tickets
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tickets Abiertos por Departamento -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Tickets Abiertos por Departamento</h5>
+                    <a asp-action="TicketsAbiertosDepto" class="btn btn-sm btn-primary">Ver Todos</a>
+                </div>
+                <div class="card-body">
+                    @if (Model.TicketsAbiertosDepto.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Título</th>
+                                        <th>Solicitante</th>
+                                        <th>Departamento</th>
+                                        <th>Categoría</th>
+                                        <th>Fecha Alta</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var ticket in Model.TicketsAbiertosDepto.Take(5))
+                                    {
+                                        <tr>
+                                            <td>@ticket.IdTicket</td>
+                                            <td>@ticket.Titulo</td>
+                                            <td>@ticket.Solicitante</td>
+                                            <td>@ticket.Departamento</td>
+                                            <td>@ticket.Categoria</td>
+                                            <td>@ticket.FeAlta.ToString("dd/MM/yyyy HH:mm")</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary" onclick="verDetalle(@ticket.IdTicket)">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-folder-open fa-3x mb-3"></i>
+                            <p>No hay tickets abiertos en tu departamento</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tickets En Proceso Asignados -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Tickets Asignados a Mí</h5>
+                    <a asp-action="TicketsAsignados" class="btn btn-sm btn-info">Ver Todos</a>
+                </div>
+                <div class="card-body">
+                    @if (Model.TicketsEnProcesoAsignados.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Título</th>
+                                        <th>Solicitante</th>
+                                        <th>Prioridad</th>
+                                        <th>Fecha Asignación</th>
+                                        <th>Fecha Compromiso</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var ticket in Model.TicketsEnProcesoAsignados.Take(5))
+                                    {
+                                        <tr>
+                                            <td>@ticket.IdTicket</td>
+                                            <td>@ticket.Titulo</td>
+                                            <td>@ticket.Solicitante</td>
+                                            <td>
+                                                <span class="badge badge-@(ticket.IdPrioridad == 3 ? "danger" : ticket.IdPrioridad == 2 ? "warning" : "secondary")">
+                                                    @(ticket.IdPrioridad == 3 ? "Alta" : ticket.IdPrioridad == 2 ? "Media" : "Baja")
+                                                </span>
+                                            </td>
+                                            <td>@(ticket.FeAsignacion?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")</td>
+                                            <td>@(ticket.FeCompromiso?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary" onclick="verDetalle(@ticket.IdTicket)">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-success" onclick="trabajarTicket(@ticket.IdTicket)">
+                                                    <i class="fas fa-play"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-user-check fa-3x mb-3"></i>
+                            <p>No tienes tickets asignados</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas por Departamento -->
+    @if (Model.Estadisticas.PorDepartamento.Any())
+    {
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Tickets por Departamento</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="chartDepartamentos" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Tickets por Prioridad</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="chartPrioridades" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Modal para detalles del ticket -->
+<div class="modal fade" id="ticketModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detalles del Ticket</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="ticketModalBody">
+                <!-- Contenido cargado dinámicamente -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Función para ver detalles del ticket
+        function verDetalle(idTicket) {
+            // Por ahora, mostrar información básica
+            $('#ticketModalBody').html(`
+                <div class="text-center">
+                    <i class="fas fa-spinner fa-spin fa-2x"></i>
+                    <p>Cargando detalles del ticket #${idTicket}...</p>
+                </div>
+            `);
+            $('#ticketModal').modal('show');
+            
+            // Aquí se podría hacer una llamada AJAX para obtener los detalles completos
+            setTimeout(() => {
+                $('#ticketModalBody').html(`
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>ID Ticket:</strong> ${idTicket}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Estado:</strong> <span class="badge badge-primary">Abierto</span>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-12">
+                            <strong>Descripción:</strong>
+                            <p>Detalles del ticket serán cargados aquí...</p>
+                        </div>
+                    </div>
+                `);
+            }, 1000);
+        }
+
+        // Función para trabajar en un ticket
+        function trabajarTicket(idTicket) {
+            if (confirm('¿Deseas comenzar a trabajar en este ticket?')) {
+                // Aquí se implementaría la lógica para cambiar el estado del ticket
+                alert('Funcionalidad de trabajo en ticket será implementada próximamente');
+            }
+        }
+
+        // Gráficos de estadísticas
+        @if (Model.Estadisticas.PorDepartamento.Any())
+        {
+            <text>
+            // Gráfico de departamentos
+            const ctxDepartamentos = document.getElementById('chartDepartamentos').getContext('2d');
+            new Chart(ctxDepartamentos, {
+                type: 'doughnut',
+                data: {
+                    labels: [@Html.Raw(string.Join(",", Model.Estadisticas.PorDepartamento.Keys.Select(k => $"'{k}'")))],
+                    datasets: [{
+                        data: [@string.Join(",", Model.Estadisticas.PorDepartamento.Values)],
+                        backgroundColor: [
+                            '#FF6384',
+                            '#36A2EB',
+                            '#FFCE56',
+                            '#4BC0C0',
+                            '#9966FF',
+                            '#FF9F40'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+            </text>
+        }
+
+        @if (Model.Estadisticas.PorPrioridad.Any())
+        {
+            <text>
+            // Gráfico de prioridades
+            const ctxPrioridades = document.getElementById('chartPrioridades').getContext('2d');
+            new Chart(ctxPrioridades, {
+                type: 'bar',
+                data: {
+                    labels: ['Baja', 'Media', 'Alta'],
+                    datasets: [{
+                        label: 'Tickets',
+                        data: [
+                            @(Model.Estadisticas.PorPrioridad.ContainsKey("1") ? Model.Estadisticas.PorPrioridad["1"] : 0),
+                            @(Model.Estadisticas.PorPrioridad.ContainsKey("2") ? Model.Estadisticas.PorPrioridad["2"] : 0),
+                            @(Model.Estadisticas.PorPrioridad.ContainsKey("3") ? Model.Estadisticas.PorPrioridad["3"] : 0)
+                        ],
+                        backgroundColor: [
+                            '#28a745',
+                            '#ffc107',
+                            '#dc3545'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            </text>
+        }
+    </script>
+}

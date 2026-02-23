@@ -1,0 +1,325 @@
+﻿@model IndigoAssistMVC.ViewModels.ActivoViewModel
+
+@{
+    ViewData["Title"] = "Crear Activo";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="display-6 text-primary">
+                        <i class="fas fa-plus-circle me-2"></i>
+                        Crear Nuevo Activo
+                    </h1>
+                    <p class="text-muted">Complete la información del activo a registrar</p>
+                </div>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>
+                    Volver al Listado
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-11 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-laptop me-2"></i>
+                        Información del Activo
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        
+                        <!-- Información Básica -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-secondary border-bottom pb-2 mb-3">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Información Básica
+                                </h6>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Codigo" class="form-label fw-bold"></label>
+                                <input asp-for="Codigo" class="form-control" placeholder="Ej: ACT-001" />
+                                <span asp-validation-for="Codigo" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Nombre" class="form-label fw-bold"></label>
+                                <input asp-for="Nombre" class="form-control" placeholder="Nombre descriptivo del activo" />
+                                <span asp-validation-for="Nombre" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Especificaciones Técnicas -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-secondary border-bottom pb-2 mb-3">
+                                    <i class="fas fa-cogs me-1"></i>
+                                    Especificaciones Técnicas
+                                </h6>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Marca" class="form-label"></label>
+                                <input asp-for="Marca" class="form-control" placeholder="Ej: Dell, HP, Lenovo" />
+                                <span asp-validation-for="Marca" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Modelo" class="form-label"></label>
+                                <input asp-for="Modelo" class="form-control" placeholder="Modelo específico" />
+                                <span asp-validation-for="Modelo" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Serie" class="form-label"></label>
+                                <input asp-for="Serie" class="form-control" placeholder="Número de serie" />
+                                <span asp-validation-for="Serie" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Catálogos -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-secondary border-bottom pb-2 mb-3">
+                                    <i class="fas fa-list-alt me-1"></i>
+                                    Clasificación
+                                </h6>
+                            </div>
+                            <div class="col-md-12 mb-4">
+                                <label asp-for="IdTipoActivo" class="form-label fw-bold">Tipo de Activo</label><br />
+                                @if (Model.TipoActivoList != null)
+                                {
+                                    @foreach (var opt in Model.TipoActivoList)
+                                    {
+                                        <div class="form-check form-check-inline">
+                                            <input type="radio"
+                                                   asp-for="IdTipoActivo"
+                                                   id="@($"IdTipoActivo_{opt.Value}")"
+                                                   value="@opt.Value"
+                                                   class="form-check-input" />
+                                            <label class="form-check-label" for="@($"IdTipoActivo_{opt.Value}")">
+                                                @opt.Text
+                                            </label>
+                                        </div>
+                                    }
+                                }
+                                <span asp-validation-for="IdTipoActivo" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="IdDepartamento" class="form-label fw-bold"></label>
+                                <select asp-for="IdDepartamento" asp-items="Model.DepartamentoList" class="form-select">
+                                    <option value="">-- Seleccione un departamento --</option>
+                                </select>
+                                <span asp-validation-for="IdDepartamento" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="IdStatus" class="form-label fw-bold"></label>
+                                <select asp-for="IdStatus" asp-items="Model.StatusList" class="form-select">
+                                    <option value="">-- Seleccione un status --</option>
+                                </select>
+                                <span asp-validation-for="IdStatus" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="IdProveedor" class="form-label fw-bold"></label>
+                                <select asp-for="IdProveedor" asp-items="Model.ProveedorList" class="form-select">
+                                    <option value="">-- Seleccione un proveedor --</option>
+                                </select>
+                                <span asp-validation-for="IdProveedor" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Asignación y Ubicación -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-secondary border-bottom pb-2 mb-3">
+                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                    Asignación y Ubicación
+                                </h6>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="PersonaAsign" class="form-label"></label>
+                                <input asp-for="PersonaAsign" class="form-control" placeholder="Nombre de la persona asignada" />
+                                <span asp-validation-for="PersonaAsign" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Ubicacion" class="form-label"></label>
+                                <input asp-for="Ubicacion" class="form-control" placeholder="Ubicación física del activo" />
+                                <span asp-validation-for="Ubicacion" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Fechas -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-secondary border-bottom pb-2 mb-3">
+                                    <i class="fas fa-calendar-alt me-1"></i>
+                                    Fechas Importantes
+                                </h6>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="FeAlta" class="form-label fw-bold"></label>
+                                <input asp-for="FeAlta" type="date" class="form-control" />
+                                <span asp-validation-for="FeAlta" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="FeCompra" class="form-label"></label>
+                                <input asp-for="FeCompra" type="date" class="form-control" />
+                                <span asp-validation-for="FeCompra" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="FeBaja" class="form-label"></label>
+                                <input asp-for="FeBaja" type="date" class="form-control" />
+                                <span asp-validation-for="FeBaja" class="text-danger"></span>
+                                <div class="form-text">Solo si el activo ya está dado de baja</div>
+                            </div>
+                        </div>
+
+                        <!-- Información Adicional -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-secondary border-bottom pb-2 mb-3">
+                                    <i class="fas fa-plus-square me-1"></i>
+                                    Información Adicional
+                                </h6>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="CostoCompra" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input asp-for="CostoCompra" class="form-control" step="0.01" placeholder="0.00" />
+                                </div>
+                                <span asp-validation-for="CostoCompra" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Componentes del Activo</label>
+                                <select name="ComponentesSeleccionados" asp-items="Model.ComponentesOptions" 
+                                        class="form-select" multiple size="6">
+                                </select>
+                                <div class="form-text">Mantén Ctrl/Cmd para seleccionar varios componentes</div>
+                                <span asp-validation-for="CodificacionComponentes" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Switch para Software OP -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="form-check form-switch">
+                                    <input asp-for="TieneSoftwareOP" class="form-check-input" type="checkbox" />
+                                    <label asp-for="TieneSoftwareOP" class="form-check-label"></label>
+                                    <div class="form-text">Marque si el activo incluye software operativo</div>
+                                </div> 
+                            </div>
+                        </div>
+
+                        <!-- Notas -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <label asp-for="Notas" class="form-label"></label>
+                                <textarea asp-for="Notas" class="form-control" rows="4" placeholder="Observaciones, comentarios adicionales..."></textarea>
+                                <span asp-validation-for="Notas" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Botones de Acción -->
+                        <div class="row">
+                            <div class="col-12">
+                                <hr class="mb-4">
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <a asp-action="Index" class="btn btn-outline-secondary me-2">
+                                        <i class="fas fa-times me-1"></i>
+                                        Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-1"></i>
+                                        Guardar Activo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Agregar Font Awesome si no está incluido -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<style>
+    .card {
+        border: none;
+        border-radius: 15px;
+    }
+    
+    .card-header {
+        border-radius: 15px 15px 0 0 !important;
+    }
+    
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .form-check-input:checked {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+    
+    .btn {
+        border-radius: 8px;
+        transition: all 0.2s ease-in-out;
+    }
+    
+    .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .input-group-text {
+        border-radius: 8px 0 0 8px;
+    }
+    
+    .input-group .form-control {
+        border-radius: 0 8px 8px 0;
+    }
+    
+    /* Estilos para radio buttons mejorados */
+    .form-check {
+        transition: all 0.2s ease-in-out;
+        cursor: pointer;
+    }
+    
+    .form-check:hover {
+        background-color: rgba(13, 110, 253, 0.05) !important;
+        border-color: #0d6efd !important;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .form-check-input:checked + .form-check-label {
+        color: #0d6efd;
+        font-weight: 600;
+    }
+    
+    .form-check-input:checked ~ * {
+        background-color: rgba(13, 110, 253, 0.1) !important;
+        border-color: #0d6efd !important;
+    }
+</style>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

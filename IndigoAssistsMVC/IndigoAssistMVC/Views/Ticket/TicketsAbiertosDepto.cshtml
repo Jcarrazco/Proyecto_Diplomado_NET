@@ -1,0 +1,298 @@
+@model List<TicketVista>
+@{
+    ViewData["Title"] = "Tickets Abiertos por Departamento";
+    var usuario = Context.Session.GetString("NombreCompleto");
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">Tickets Abiertos por Departamento</h1>
+                    <p class="text-muted mb-0">Usuario: @usuario</p>
+                </div>
+                <div>
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver al Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Filtros</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label for="filtroDepartamento" class="form-label">Departamento</label>
+                            <select id="filtroDepartamento" class="form-select">
+                                <option value="">Todos</option>
+                                @foreach (var depto in Model.Select(t => t.Departamento).Distinct().OrderBy(d => d))
+                                {
+                                    <option value="@depto">@depto</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="filtroCategoria" class="form-label">Categoría</label>
+                            <select id="filtroCategoria" class="form-select">
+                                <option value="">Todas</option>
+                                @foreach (var categoria in Model.Select(t => t.Categoria).Distinct().OrderBy(c => c))
+                                {
+                                    <option value="@categoria">@categoria</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="filtroPrioridad" class="form-label">Prioridad</label>
+                            <select id="filtroPrioridad" class="form-select">
+                                <option value="">Todas</option>
+                                <option value="1">Baja</option>
+                                <option value="2">Media</option>
+                                <option value="3">Alta</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="filtroBusqueda" class="form-label">Buscar</label>
+                            <input type="text" id="filtroBusqueda" class="form-control" placeholder="Título o descripción...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Tickets -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        Tickets Abiertos 
+                        <span class="badge bg-primary" id="contadorTickets">@Model.Count</span>
+                    </h5>
+                    <div>
+                        <button class="btn btn-sm btn-outline-primary" onclick="exportarExcel()">
+                            <i class="fas fa-file-excel"></i> Exportar
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="actualizarTabla()">
+                            <i class="fas fa-sync-alt"></i> Actualizar
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="tablaTickets">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Título</th>
+                                        <th>Solicitante</th>
+                                        <th>Departamento</th>
+                                        <th>Categoría</th>
+                                        <th>Subcategoría</th>
+                                        <th>Tipo</th>
+                                        <th>Prioridad</th>
+                                        <th>Fecha Alta</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var ticket in Model)
+                                    {
+                                        <tr data-departamento="@ticket.Departamento" 
+                                            data-categoria="@ticket.Categoria" 
+                                            data-prioridad="@ticket.IdPrioridad"
+                                            data-busqueda="@($"{ticket.Titulo} {ticket.Descripcion}".ToLower())">
+                                            <td>
+                                                <strong>#@ticket.IdTicket</strong>
+                                            </td>
+                                            <td>
+                                                <div class="fw-bold">@ticket.Titulo</div>
+                                                <small class="text-muted">@(ticket.Descripcion.Length > 100 ? ticket.Descripcion.Substring(0, 100) + "..." : ticket.Descripcion)</small>
+                                            </td>
+                                            <td>@ticket.Solicitante</td>
+                                            <td>
+                                                <span class="badge bg-info">@ticket.Departamento</span>
+                                            </td>
+                                            <td>@ticket.Categoria</td>
+                                            <td>@ticket.SubCategoria</td>
+                                            <td>
+                                                @if (ticket.IdTipoTicket.HasValue)
+                                                {
+                                                    <span class="badge bg-secondary">@ticket.IdTipoTicket</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">N/A</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (ticket.IdPrioridad.HasValue)
+                                                {
+                                                    <span class="badge badge-@(ticket.IdPrioridad == 3 ? "danger" : ticket.IdPrioridad == 2 ? "warning" : "secondary")">
+                                                        @(ticket.IdPrioridad == 3 ? "Alta" : ticket.IdPrioridad == 2 ? "Media" : "Baja")
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">N/A</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div>@ticket.FeAlta.ToString("dd/MM/yyyy")</div>
+                                                <small class="text-muted">@ticket.FeAlta.ToString("HH:mm")</small>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <button class="btn btn-sm btn-outline-primary" onclick="verDetalle(@ticket.IdTicket)" title="Ver Detalles">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-success" onclick="asignarTicket(@ticket.IdTicket)" title="Asignar">
+                                                        <i class="fas fa-user-plus"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-warning" onclick="cambiarPrioridad(@ticket.IdTicket)" title="Cambiar Prioridad">
+                                                        <i class="fas fa-exclamation-triangle"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-folder-open fa-4x mb-3"></i>
+                            <h4>No hay tickets abiertos</h4>
+                            <p>No se encontraron tickets abiertos en tu departamento.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para detalles del ticket -->
+<div class="modal fade" id="ticketModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detalles del Ticket</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="ticketModalBody">
+                <!-- Contenido cargado dinámicamente -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Aplicar filtros en tiempo real
+            $('#filtroDepartamento, #filtroCategoria, #filtroPrioridad').on('change', filtrarTabla);
+            $('#filtroBusqueda').on('keyup', filtrarTabla);
+        });
+
+        function filtrarTabla() {
+            const filtroDepto = $('#filtroDepartamento').val();
+            const filtroCategoria = $('#filtroCategoria').val();
+            const filtroPrioridad = $('#filtroPrioridad').val();
+            const filtroBusqueda = $('#filtroBusqueda').val().toLowerCase();
+
+            let filasVisibles = 0;
+
+            $('#tablaTickets tbody tr').each(function() {
+                const fila = $(this);
+                const depto = fila.data('departamento');
+                const categoria = fila.data('categoria');
+                const prioridad = fila.data('prioridad');
+                const busqueda = fila.data('busqueda');
+
+                const cumpleFiltros = 
+                    (filtroDepto === '' || depto === filtroDepto) &&
+                    (filtroCategoria === '' || categoria === filtroCategoria) &&
+                    (filtroPrioridad === '' || prioridad == filtroPrioridad) &&
+                    (filtroBusqueda === '' || busqueda.includes(filtroBusqueda));
+
+                if (cumpleFiltros) {
+                    fila.show();
+                    filasVisibles++;
+                } else {
+                    fila.hide();
+                }
+            });
+
+            $('#contadorTickets').text(filasVisibles);
+        }
+
+        function verDetalle(idTicket) {
+            $('#ticketModalBody').html(`
+                <div class="text-center">
+                    <i class="fas fa-spinner fa-spin fa-2x"></i>
+                    <p>Cargando detalles del ticket #${idTicket}...</p>
+                </div>
+            `);
+            $('#ticketModal').modal('show');
+            
+            // Simular carga de datos
+            setTimeout(() => {
+                $('#ticketModalBody').html(`
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>ID Ticket:</strong> ${idTicket}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Estado:</strong> <span class="badge bg-primary">Abierto</span>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-12">
+                            <strong>Descripción:</strong>
+                            <p>Detalles completos del ticket serán cargados aquí...</p>
+                        </div>
+                    </div>
+                `);
+            }, 1000);
+        }
+
+        function asignarTicket(idTicket) {
+            if (confirm('¿Deseas asignar este ticket a un técnico?')) {
+                alert('Funcionalidad de asignación será implementada próximamente');
+            }
+        }
+
+        function cambiarPrioridad(idTicket) {
+            if (confirm('¿Deseas cambiar la prioridad de este ticket?')) {
+                alert('Funcionalidad de cambio de prioridad será implementada próximamente');
+            }
+        }
+
+        function exportarExcel() {
+            alert('Funcionalidad de exportación será implementada próximamente');
+        }
+
+        function actualizarTabla() {
+            location.reload();
+        }
+    </script>
+}

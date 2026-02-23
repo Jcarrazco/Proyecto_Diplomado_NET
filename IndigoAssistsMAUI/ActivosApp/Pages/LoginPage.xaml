@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ActivosApp.Pages.LoginPage"
+             Title="Login">
+    <ScrollView>
+        <VerticalStackLayout Padding="32" Spacing="20" HorizontalOptions="Center" WidthRequest="360">
+            <Image Source="logo.png"
+                   HeightRequest="120"
+                   WidthRequest="120"
+                   Aspect="AspectFit"
+                   HorizontalOptions="Center" />
+
+            <VerticalStackLayout Spacing="6" HorizontalOptions="Center">
+                <Label Text="ActivosApp" FontSize="28" FontAttributes="Bold" HorizontalTextAlignment="Center" />
+                <Label Text="Ingreso" FontSize="16" TextColor="#666666" HorizontalTextAlignment="Center" />
+                <Label Text="Administrador: admin@indigo.com / Password123!"
+                       FontSize="12"
+                       TextColor="#6B7280"
+                       HorizontalTextAlignment="Center" />
+            </VerticalStackLayout>
+
+            <Frame CornerRadius="16" Padding="20" HasShadow="True" BackgroundColor="White">
+                <VerticalStackLayout Spacing="12">
+                    <Border Stroke="#E0E0E0" StrokeThickness="1" StrokeShape="RoundRectangle 12" Padding="12">
+                        <Entry x:Name="EmailEntry" Placeholder="Usuario" />
+                    </Border>
+
+                    <Border Stroke="#E0E0E0" StrokeThickness="1" StrokeShape="RoundRectangle 12" Padding="12">
+                        <Entry x:Name="PasswordEntry" Placeholder="Password" IsPassword="True" />
+                    </Border>
+
+                    <Button x:Name="IngresarButton"
+                            Text="Ingresar"
+                            CornerRadius="10"
+                            HeightRequest="48"
+                            Clicked="OnLoginClicked" />
+                    <Button x:Name="RegistrarButton"
+                            Text="Registrar"
+                            CornerRadius="10"
+                            HeightRequest="48"
+                            Clicked="OnRegisterClicked" />
+                    <ActivityIndicator x:Name="LoadingIndicator" IsVisible="False" IsRunning="False" />
+                </VerticalStackLayout>
+            </Frame>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

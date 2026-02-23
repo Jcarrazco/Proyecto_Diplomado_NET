@@ -1,0 +1,131 @@
+@model IndigoAssistMVC.ViewModels.CrearUsuarioViewModel
+@{
+    ViewData["Title"] = "Crear Usuario";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-user-plus"></i> Crear Nuevo Usuario</h2>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver a Usuarios
+                </a>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-user"></i> Información del Usuario</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="UserName" class="form-label"></label>
+                                    <input asp-for="UserName" class="form-control" />
+                                    <span asp-validation-for="UserName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Email" class="form-label"></label>
+                                    <input asp-for="Email" class="form-control" type="email" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label asp-for="NombreCompleto" class="form-label"></label>
+                                    <input asp-for="NombreCompleto" class="form-control" />
+                                    <span asp-validation-for="NombreCompleto" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="IdDepartamento" class="form-label"></label>
+                                    <select asp-for="IdDepartamento" class="form-select">
+                                        <option value="">Seleccionar departamento</option>
+                                        @foreach (var depto in Model.DepartamentosDisponibles)
+                                        {
+                                            <option value="@depto.IdDepartamento">@depto.Nombre</option>
+                                        }
+                                    </select>
+                                    <span asp-validation-for="IdDepartamento" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input asp-for="Activo" class="form-check-input" />
+                                        <label asp-for="Activo" class="form-check-label"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="LegacyLogin" class="form-label"></label>
+                                    <input asp-for="LegacyLogin" class="form-control" maxlength="12" />
+                                    <span asp-validation-for="LegacyLogin" class="text-danger"></span>
+                                    <div class="form-text">Login legacy requerido para roles de tickets (max 12 caracteres).</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Roles</label>
+                                    <div class="row">
+                                        @foreach (var rol in Model.RolesDisponibles)
+                                        {
+                                            <div class="col-md-3 col-sm-6">
+                                                <div class="form-check">
+                                                    <input type="checkbox" name="RolesSeleccionados" value="@rol.Name" 
+                                                           class="form-check-input" id="rol_@rol.Name" />
+                                                    <label class="form-check-label" for="rol_@rol.Name">
+                                                        @rol.Name
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Información importante:</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>Se creará una contraseña temporal que se mostrará después de crear el usuario</li>
+                                <li>El usuario deberá cambiar su contraseña en el primer login</li>
+                                <li>El email se confirmará automáticamente</li>
+                            </ul>
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+                            <a asp-action="Index" class="btn btn-secondary me-2">Cancelar</a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i> Crear Usuario
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

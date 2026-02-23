@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\IndigoAssits.Core\IndigoAssits.Core.csproj" />
+    <ProjectReference Include="..\IndigoAssits.Repositorio.Core\IndigoAssits.Repositorio.Core.csproj" />
+    <ProjectReference Include="..\IndigoAsists.Repositorio\IndigoAsists.Repositorio.csproj" />
+  </ItemGroup>
+
+</Project>

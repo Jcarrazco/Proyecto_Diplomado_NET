@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ActivosApp.Pages.ActivoEditPage"
+             Title="Editar Activo">
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="10">
+            <Label Text="Editar activo" FontSize="22" FontAttributes="Bold" />
+
+            <Entry x:Name="CodigoEntry" Placeholder="Codigo" />
+            <Entry x:Name="NombreEntry" Placeholder="Nombre" />
+            <Entry x:Name="MarcaEntry" Placeholder="Marca" />
+            <Entry x:Name="ModeloEntry" Placeholder="Modelo" />
+            <Entry x:Name="SerieEntry" Placeholder="Serie" />
+            <Entry x:Name="PersonaEntry" Placeholder="Persona asignada" />
+            <Entry x:Name="UbicacionEntry" Placeholder="Ubicacion" />
+
+            <DatePicker x:Name="FeCompraPicker" />
+            <DatePicker x:Name="FeAltaPicker" />
+
+            <Entry x:Name="CostoEntry" Placeholder="Costo compra" Keyboard="Numeric" />
+            <Entry x:Name="CodificacionEntry" Placeholder="Codificacion componentes" Keyboard="Numeric" />
+
+            <Entry x:Name="TipoEntry" Placeholder="Tipo activo" />
+            <Entry x:Name="DepartamentoEntry" Placeholder="Departamento" />
+            <Entry x:Name="StatusEntry" Placeholder="Status" />
+            <Entry x:Name="ProveedorEntry" Placeholder="Proveedor" />
+
+            <Editor x:Name="NotasEditor" Placeholder="Notas" AutoSize="TextChanges" />
+
+            <HorizontalStackLayout Spacing="10">
+                <Label Text="Tiene software OP" VerticalOptions="Center" />
+                <Switch x:Name="SoftwareSwitch" />
+            </HorizontalStackLayout>
+
+            <Button x:Name="ActualizarButton" Text="Actualizar" Clicked="OnActualizarClicked" />
+            <ActivityIndicator x:Name="LoadingIndicator" IsVisible="False" IsRunning="False" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -1,0 +1,169 @@
+@model IndigoAssistMVC.Models.LoginViewModel
+@{
+    ViewData["Title"] = "Iniciar Sesión";
+    Layout = null; // Layout personalizado para login
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - IndigoAssist</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .login-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .login-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .login-header h2 {
+            margin: 0;
+            font-weight: 300;
+        }
+        
+        .login-body {
+            padding: 2rem;
+        }
+        
+        .form-floating {
+            margin-bottom: 1rem;
+        }
+        
+        .btn-login {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: 500;
+            width: 100%;
+            margin-top: 1rem;
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .form-check-input:checked {
+            background-color: #667eea;
+            border-color: #667eea;
+        }
+        
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+        
+        .text-muted {
+            font-size: 0.9rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+        
+        .usuarios-prueba {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            border-left: 4px solid #667eea;
+        }
+        
+        .usuarios-prueba strong {
+            color: #667eea;
+        }
+        
+        .usuarios-prueba small {
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h2><i class="fas fa-shield-alt"></i> IndigoAssist</h2>
+            <p class="mb-0">Sistema de Soporte Técnico</p>
+        </div>
+        
+        <div class="login-body">
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Error de autenticación:</strong>
+                    <ul class="mb-0 mt-2">
+                        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                        {
+                            <li>@error.ErrorMessage</li>
+                        }
+                    </ul>
+                </div>
+            }
+            
+            <form asp-action="Login" method="post">
+                <div class="form-floating">
+                    <input asp-for="Usuario" class="form-control" placeholder="Usuario" autocomplete="username" />
+                    <label asp-for="Usuario"></label>
+                    <span asp-validation-for="Usuario" class="text-danger"></span>
+                </div>
+                
+                <div class="form-floating">
+                    <input asp-for="Password" class="form-control" placeholder="Contraseña" autocomplete="current-password" />
+                    <label asp-for="Password"></label>
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                
+                <div class="form-check">
+                    <input asp-for="Recordarme" class="form-check-input" />
+                    <label asp-for="Recordarme" class="form-check-label">
+                        Recordarme
+                    </label>
+                </div>
+                
+                @if (!string.IsNullOrEmpty(Model.ReturnUrl))
+                {
+                    <input asp-for="ReturnUrl" type="hidden" />
+                }
+                
+                <button type="submit" class="btn btn-primary btn-login">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                </button>
+            </form>
+            
+            <div class="usuarios-prueba">
+                <small class="text-muted">
+                    <strong><i class="fas fa-info-circle"></i> Usuarios de prueba:</strong><br>
+                    <strong>Administrador:</strong> admin@indigo.com / Password123!<br>
+                    <strong>Supervisor:</strong> supervisor@indigo.com / Password123!<br>
+                    <strong>Técnico:</strong> tecnico@indigo.com / Password123!<br>
+                    <strong>Usuario:</strong> usuario@indigo.com / Password123!
+                </small>
+            </div>
+        </div>
+    </div>
+    
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</body>
+</html>

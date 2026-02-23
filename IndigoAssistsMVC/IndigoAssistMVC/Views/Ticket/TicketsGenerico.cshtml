@@ -1,0 +1,488 @@
+@model List<TicketVista>
+@using IndigoAssits.Core.Dtos
+@{
+    ViewData["Title"] = ViewBag.Titulo ?? "Tickets";
+    var usuario = Context.Session.GetString("NombreCompleto");
+    var tipoConsulta = ViewBag.TipoConsulta ?? "tickets";
+    var estadoActual = ViewBag.EstadoActual ?? "Todos";
+    var legacyMissing = ViewBag.LegacyMissing as bool? == true;
+    var legacyAdmin = ViewBag.LegacyAdmin as bool? == true;
+    var tecnicos = ViewBag.Tecnicos as List<TecnicoDto> ?? new List<TecnicoDto>();
+    var departamentos = ViewBag.Departamentos as List<mDepartamentos> ?? new List<mDepartamentos>();
+    var puedeAsignar = (User.IsInRole("Administrador") || User.IsInRole("Supervisor")) && tecnicos.Any();
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">@ViewData["Title"]</h1>
+                    <p class="text-muted mb-0">Usuario: @usuario</p>
+                </div>
+                <div>
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver al Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="btn-group" role="group">
+                <a asp-action="TicketsAbiertosDepto" class="btn btn-outline-primary">Abiertos</a>
+                <a asp-action="TicketsEnProcesoDepto" class="btn btn-outline-warning">En Proceso</a>
+                <a asp-action="TicketsCerradosDepto" class="btn btn-outline-success">Cerrados</a>
+                @if (User.IsInRole("Administrador"))
+                {
+                    <a asp-action="TicketsTodos" class="btn btn-outline-dark">Todos</a>
+                }
+            </div>
+        </div>
+    </div>
+
+    @if (legacyMissing && legacyAdmin)
+    {
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-shield-alt"></i>
+                    Usuario administrador sin contexto legacy. Mostrando todos los tickets.
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Información del Estado -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-@(estadoActual == "Abierto" ? "primary" : estadoActual == "En Proceso" ? "warning" : estadoActual == "Cerrado" ? "success" : "info")" role="alert">
+                <i class="fas fa-info-circle"></i>
+                <strong>Estado:</strong> @estadoActual | 
+                <strong>Total:</strong> @Model.Count tickets
+                @if (tipoConsulta == "asignados")
+                {
+                    <span class="ms-3"><i class="fas fa-user-check"></i> Tickets asignados a ti</span>
+                }
+                else if (tipoConsulta == "departamento")
+                {
+                    <span class="ms-3"><i class="fas fa-building"></i> Tickets de tu departamento</span>
+                }
+                else if (tipoConsulta == "usuario")
+                {
+                    <span class="ms-3"><i class="fas fa-user"></i> Tickets solicitados por ti</span>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Filtros</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label for="filtroDepartamento" class="form-label">Departamento</label>
+                            <select id="filtroDepartamento" class="form-select">
+                                <option value="">Todos</option>
+                                @if (departamentos.Any())
+                                {
+                                    foreach (var depto in departamentos.OrderBy(d => d.Departamento))
+                                    {
+                                        <option value="@depto.Departamento">@depto.Departamento</option>
+                                    }
+                                }
+                                else
+                                {
+                                    foreach (var depto in Model.Select(t => t.Departamento).Distinct().OrderBy(d => d))
+                                    {
+                                        <option value="@depto">@depto</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="filtroCategoria" class="form-label">Categoría</label>
+                            <select id="filtroCategoria" class="form-select">
+                                <option value="">Todas</option>
+                                @foreach (var categoria in Model.Select(t => t.Categoria).Distinct().OrderBy(c => c))
+                                {
+                                    <option value="@categoria">@categoria</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="filtroPrioridad" class="form-label">Prioridad</label>
+                            <select id="filtroPrioridad" class="form-select">
+                                <option value="">Todas</option>
+                                <option value="1">Baja</option>
+                                <option value="2">Media</option>
+                                <option value="3">Alta</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="filtroTecnico" class="form-label">Técnico</label>
+                            <select id="filtroTecnico" class="form-select">
+                                <option value="">Todos</option>
+                                @foreach (var tecnico in Model.Where(t => !string.IsNullOrEmpty(t.Tecnico)).Select(t => t.Tecnico).Distinct().OrderBy(t => t))
+                                {
+                                    <option value="@tecnico">@tecnico</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="filtroFecha" class="form-label">Fecha</label>
+                            <select id="filtroFecha" class="form-select">
+                                <option value="">Todas</option>
+                                <option value="hoy">Hoy</option>
+                                <option value="semana">Esta Semana</option>
+                                <option value="mes">Este Mes</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="filtroBusqueda" class="form-label">Buscar</label>
+                            <input type="text" id="filtroBusqueda" class="form-control" placeholder="Título...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Tickets -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        @ViewData["Title"] 
+                        <span class="badge bg-primary" id="contadorTickets">@Model.Count</span>
+                    </h5>
+                    <div>
+                        <button class="btn btn-sm btn-outline-primary" onclick="exportarExcel()">
+                            <i class="fas fa-file-excel"></i> Exportar
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="actualizarTabla()">
+                            <i class="fas fa-sync-alt"></i> Actualizar
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="tablaTickets">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Título</th>
+                                        <th>Solicitante</th>
+                                        <th>Técnico</th>
+                                        <th>Departamento</th>
+                                        <th>Categoría</th>
+                                        <th>Prioridad</th>
+                                        <th>Fecha Alta</th>
+                                        @if (estadoActual == "En Proceso" || estadoActual == "Cerrado")
+                                        {
+                                            <th>Fecha Asignación</th>
+                                        }
+                                        @if (estadoActual == "Cerrado")
+                                        {
+                                            <th>Fecha Cierre</th>
+                                        }
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var ticket in Model)
+                                    {
+                                        <tr data-departamento="@ticket.Departamento" 
+                                            data-categoria="@ticket.Categoria" 
+                                            data-prioridad="@ticket.IdPrioridad"
+                                            data-tecnico="@ticket.Tecnico"
+                                            data-fecha="@ticket.FeAlta.ToString("yyyy-MM-dd")"
+                                            data-busqueda="@($"{ticket.Titulo} {ticket.Descripcion}".ToLower())">
+                                            <td>
+                                                <strong>#@ticket.IdTicket</strong>
+                                            </td>
+                                            <td>
+                                                <div class="fw-bold">@ticket.Titulo</div>
+                                                <small class="text-muted">@(ticket.Descripcion.Length > 80 ? ticket.Descripcion.Substring(0, 80) + "..." : ticket.Descripcion)</small>
+                                            </td>
+                                            <td>@ticket.Solicitante</td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(ticket.Tecnico))
+                                                {
+                                                    <span class="badge bg-info">@ticket.Tecnico</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Sin asignar</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-secondary">@ticket.Departamento</span>
+                                            </td>
+                                            <td>@ticket.Categoria</td>
+                                            <td>
+                                                @if (ticket.IdPrioridad.HasValue)
+                                                {
+                                                    <span class="badge bg-@(ticket.IdPrioridad == 3 ? "danger" : ticket.IdPrioridad == 2 ? "warning" : "secondary")">
+                                                        @(ticket.IdPrioridad == 3 ? "Alta" : ticket.IdPrioridad == 2 ? "Media" : "Baja")
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">N/A</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div>@ticket.FeAlta.ToString("dd/MM/yyyy")</div>
+                                                <small class="text-muted">@ticket.FeAlta.ToString("HH:mm")</small>
+                                            </td>
+                                            @if (estadoActual == "En Proceso" || estadoActual == "Cerrado")
+                                            {
+                                                <td>
+                                                    @if (ticket.FeAsignacion.HasValue)
+                                                    {
+                                                        <div>@ticket.FeAsignacion.Value.ToString("dd/MM/yyyy")</div>
+                                                        <small class="text-muted">@ticket.FeAsignacion.Value.ToString("HH:mm")</small>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">N/A</span>
+                                                    }
+                                                </td>
+                                            }
+                                            @if (estadoActual == "Cerrado")
+                                            {
+                                                <td>
+                                                    @if (ticket.FeCierre.HasValue)
+                                                    {
+                                                        <div>@ticket.FeCierre.Value.ToString("dd/MM/yyyy")</div>
+                                                        <small class="text-muted">@ticket.FeCierre.Value.ToString("HH:mm")</small>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">N/A</span>
+                                                    }
+                                                </td>
+                                            }
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <button class="btn btn-sm btn-outline-primary" onclick="verDetalle(@ticket.IdTicket)" title="Ver Detalles">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    @if (puedeAsignar && (estadoActual == "Abierto" || ticket.Status == 1))
+                                                    {
+                                                        <button class="btn btn-sm btn-outline-success" onclick="asignarTicket(@ticket.IdTicket)" title="Asignar">
+                                                            <i class="fas fa-user-plus"></i>
+                                                        </button>
+                                                    }
+                                                    @if (estadoActual == "En Proceso" && tipoConsulta == "asignados")
+                                                    {
+                                                        <button class="btn btn-sm btn-outline-warning" onclick="trabajarTicket(@ticket.IdTicket)" title="Trabajar">
+                                                            <i class="fas fa-play"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-outline-success" onclick="cerrarTicket(@ticket.IdTicket)" title="Cerrar">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                    }
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-@(estadoActual == "Abierto" ? "folder-open" : estadoActual == "En Proceso" ? "cogs" : "check-circle") fa-4x mb-3"></i>
+                            <h4>No hay @estadoActual.ToLower()</h4>
+                            <p>No se encontraron tickets @estadoActual.ToLower()@(tipoConsulta == "asignados" ? " asignados a ti" : tipoConsulta == "departamento" ? " en tu departamento" : tipoConsulta == "usuario" ? " solicitados por ti" : "").</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para asignar técnico -->
+<div class="modal fade" id="asignarModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form asp-action="AsignarTecnico" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title">Asignar Técnico</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="asignarTicketId" name="idTicket" value="" />
+                    <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                    <div class="mb-3">
+                        <label class="form-label">Técnico</label>
+                        <select class="form-select" name="tecnicoId" required>
+                            <option value="">Selecciona un técnico</option>
+                            @foreach (var tecnico in tecnicos)
+                            {
+                                <option value="@tecnico.IdPersona">@tecnico.NombreCompleto (@tecnico.Login)</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Asignar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para detalles del ticket -->
+<div class="modal fade" id="ticketModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detalles del Ticket</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="ticketModalBody">
+                <!-- Contenido cargado dinámicamente -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Aplicar filtros en tiempo real
+            $('#filtroDepartamento, #filtroCategoria, #filtroPrioridad, #filtroTecnico, #filtroFecha').on('change', filtrarTabla);
+            $('#filtroBusqueda').on('keyup', filtrarTabla);
+        });
+
+        function filtrarTabla() {
+            const filtroDepto = $('#filtroDepartamento').val();
+            const filtroCategoria = $('#filtroCategoria').val();
+            const filtroPrioridad = $('#filtroPrioridad').val();
+            const filtroTecnico = $('#filtroTecnico').val();
+            const filtroFecha = $('#filtroFecha').val();
+            const filtroBusqueda = $('#filtroBusqueda').val().toLowerCase();
+
+            let filasVisibles = 0;
+            const hoy = new Date();
+            const inicioSemana = new Date(hoy.setDate(hoy.getDate() - hoy.getDay()));
+            const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+
+            $('#tablaTickets tbody tr').each(function() {
+                const fila = $(this);
+                const depto = fila.data('departamento');
+                const categoria = fila.data('categoria');
+                const prioridad = fila.data('prioridad');
+                const tecnico = fila.data('tecnico');
+                const fecha = new Date(fila.data('fecha'));
+                const busqueda = fila.data('busqueda');
+
+                let cumpleFecha = true;
+                if (filtroFecha === 'hoy') {
+                    cumpleFecha = fecha.toDateString() === new Date().toDateString();
+                } else if (filtroFecha === 'semana') {
+                    cumpleFecha = fecha >= inicioSemana;
+                } else if (filtroFecha === 'mes') {
+                    cumpleFecha = fecha >= inicioMes;
+                }
+
+                const cumpleFiltros = 
+                    (filtroDepto === '' || depto === filtroDepto) &&
+                    (filtroCategoria === '' || categoria === filtroCategoria) &&
+                    (filtroPrioridad === '' || prioridad == filtroPrioridad) &&
+                    (filtroTecnico === '' || tecnico === filtroTecnico) &&
+                    cumpleFecha &&
+                    (filtroBusqueda === '' || busqueda.includes(filtroBusqueda));
+
+                if (cumpleFiltros) {
+                    fila.show();
+                    filasVisibles++;
+                } else {
+                    fila.hide();
+                }
+            });
+
+            $('#contadorTickets').text(filasVisibles);
+        }
+
+        function verDetalle(idTicket) {
+            $('#ticketModalBody').html(`
+                <div class="text-center">
+                    <i class="fas fa-spinner fa-spin fa-2x"></i>
+                    <p>Cargando detalles del ticket #${idTicket}...</p>
+                </div>
+            `);
+            $('#ticketModal').modal('show');
+            
+            setTimeout(() => {
+                $('#ticketModalBody').html(`
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>ID Ticket:</strong> ${idTicket}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Estado:</strong> <span class="badge bg-primary">@estadoActual</span>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-12">
+                            <strong>Descripción:</strong>
+                            <p>Detalles completos del ticket serán cargados aquí...</p>
+                        </div>
+                    </div>
+                `);
+            }, 1000);
+        }
+
+        function asignarTicket(idTicket) {
+            const input = document.getElementById('asignarTicketId');
+            if (input) {
+                input.value = idTicket;
+            }
+            const modal = new bootstrap.Modal(document.getElementById('asignarModal'));
+            modal.show();
+        }
+
+        function trabajarTicket(idTicket) {
+            if (confirm('¿Deseas comenzar a trabajar en este ticket?')) {
+                alert('Funcionalidad de trabajo en ticket será implementada próximamente');
+            }
+        }
+
+        function cerrarTicket(idTicket) {
+            if (confirm('¿Deseas cerrar este ticket?')) {
+                alert('Funcionalidad de cierre de ticket será implementada próximamente');
+            }
+        }
+
+        function exportarExcel() {
+            alert('Funcionalidad de exportación será implementada próximamente');
+        }
+
+        function actualizarTabla() {
+            location.reload();
+        }
+    </script>
+}

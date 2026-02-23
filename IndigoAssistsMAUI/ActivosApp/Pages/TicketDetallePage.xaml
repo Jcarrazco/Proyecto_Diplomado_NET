@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ActivosApp.Pages.TicketDetallePage"
+             Title="Ticket">
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+            <ActivityIndicator x:Name="LoadingIndicator" IsVisible="False" IsRunning="False" />
+
+            <Label x:Name="IdLabel" FontAttributes="Bold" FontSize="16" />
+            <Label x:Name="TituloLabel" FontSize="18" FontAttributes="Bold" />
+            <Label x:Name="StatusLabel" TextColor="#6B7280" />
+            <Label x:Name="DeptoLabel" TextColor="#6B7280" />
+            <Label x:Name="SolicitanteLabel" />
+            <Label x:Name="TecnicoLabel" />
+            <Label x:Name="CategoriaLabel" />
+            <Label x:Name="SubCategoriaLabel" />
+            <Label x:Name="PrioridadLabel" />
+            <Label x:Name="FeAltaLabel" />
+            <Label x:Name="DescripcionLabel" />
+
+            <BoxView HeightRequest="1" BackgroundColor="#E5E7EB" />
+
+            <Label Text="Agregar anotacion" FontAttributes="Bold" />
+            <Editor x:Name="AnotacionEditor" AutoSize="TextChanges" HeightRequest="120" Placeholder="Escribe una anotacion" />
+            <Button x:Name="AgregarAnotacionButton" Text="Guardar anotacion" Clicked="OnAgregarAnotacionClicked" />
+
+            <HorizontalStackLayout Spacing="12">
+                <Button x:Name="CerrarButton" Text="Cerrar" Clicked="OnCerrarClicked" />
+                <Button x:Name="ReabrirButton" Text="Reabrir" Clicked="OnReabrirClicked" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

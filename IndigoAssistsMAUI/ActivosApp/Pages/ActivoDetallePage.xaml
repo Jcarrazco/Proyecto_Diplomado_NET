@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ActivosApp.Pages.ActivoDetallePage"
+             Title="Detalle">
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="10">
+            <Label Text="Detalle del activo" FontSize="22" FontAttributes="Bold" />
+            <ActivityIndicator x:Name="LoadingIndicator" IsVisible="False" IsRunning="False" />
+
+            <Label x:Name="CodigoLabel" />
+            <Label x:Name="NombreLabel" />
+            <Label x:Name="MarcaLabel" />
+            <Label x:Name="ModeloLabel" />
+            <Label x:Name="SerieLabel" />
+            <Label x:Name="PersonaLabel" />
+            <Label x:Name="UbicacionLabel" />
+            <Label x:Name="StatusLabel" />
+            <Label x:Name="DepartamentoLabel" />
+            <Label x:Name="TipoLabel" />
+            <Label x:Name="ProveedorLabel" />
+            <Label x:Name="CostoLabel" />
+            <Label x:Name="NotasLabel" />
+
+            <Button Text="Editar" Clicked="OnEditarClicked" />
+            <Button Text="Borrar" Clicked="OnBorrarClicked" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

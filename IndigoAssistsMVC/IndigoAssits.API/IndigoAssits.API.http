@@ -1,0 +1,6 @@
+@IndigoAssits.API_HostAddress = http://localhost:5124
+
+GET {{IndigoAssits.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

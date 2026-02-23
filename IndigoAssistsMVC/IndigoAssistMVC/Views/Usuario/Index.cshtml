@@ -1,0 +1,306 @@
+@model IndigoAssistMVC.ViewModels.UsuarioGestionViewModel
+@{
+    ViewData["Title"] = "Gestión de Usuarios";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-users"></i> Gestión de Usuarios</h2>
+                <div class="btn-group" role="group">
+                    <a asp-action="Create" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Nuevo Usuario
+                    </a>
+                    <a asp-action="Dashboard" class="btn btn-primary">
+                        <i class="fas fa-chart-line"></i> Dashboard
+                    </a>
+                </div>
+            </div>
+
+            <!-- Filtros de búsqueda -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-filter"></i> Filtros de Búsqueda</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" asp-action="Index">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label asp-for="Filtros.Buscar" class="form-label">Buscar</label>
+                                <input asp-for="Filtros.Buscar" class="form-control" placeholder="Usuario, nombre o email..." />
+                            </div>
+                            <div class="col-md-2">
+                                <label asp-for="Filtros.RolFiltro" class="form-label">Rol</label>
+                                <select asp-for="Filtros.RolFiltro" class="form-select">
+                                    <option value="">Todos los roles</option>
+                                    @foreach (var rol in Model.Filtros.RolesDisponibles)
+                                    {
+                                        <option value="@rol.Name">@rol.Name</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label asp-for="Filtros.IdDepartamentoFiltro" class="form-label">Departamento</label>
+                                <select asp-for="Filtros.IdDepartamentoFiltro" class="form-select">
+                                    <option value="">Todos los departamentos</option>
+                                    @foreach (var depto in Model.Filtros.DepartamentosDisponibles)
+                                    {
+                                        <option value="@depto.IdDepartamento">@depto.Nombre</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label asp-for="Filtros.ActivoFiltro" class="form-label">Estado</label>
+                                <select asp-for="Filtros.ActivoFiltro" class="form-select">
+                                    <option value="">Todos</option>
+                                    <option value="true">Activos</option>
+                                    <option value="false">Inactivos</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label asp-for="Filtros.EmailConfirmedFiltro" class="form-label">Email</label>
+                                <select asp-for="Filtros.EmailConfirmedFiltro" class="form-select">
+                                    <option value="">Todos</option>
+                                    <option value="true">Confirmados</option>
+                                    <option value="false">Sin confirmar</option>
+                                </select>
+                            </div>
+                            <div class="col-md-1 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                                <a asp-action="Index" class="btn btn-secondary ms-1">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tabla de usuarios -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-table"></i> Lista de Usuarios</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="usuariosTable">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Usuario</th>
+                                    <th>Nombre Completo</th>
+                                    <th>Email</th>
+                                    <th>Departamento</th>
+                                    <th>Roles</th>
+                                    <th>Estado</th>
+                                    <th>Bloqueo</th>
+                                    <th>Fecha Registro</th>
+                                    <th>Último Acceso</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var usuario in Model.Usuarios)
+                                {
+                                    <tr>
+                                        <td>
+                                            <strong>@usuario.UserName</strong>
+                                        </td>
+                                        <td>@usuario.NombreCompleto</td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(usuario.Email))
+                                            {
+                                                <a href="mailto:@usuario.Email" class="text-decoration-none">
+                                                    <i class="fas fa-envelope"></i> @usuario.Email
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Sin email</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">@usuario.DepartamentoNombre</span>
+                                        </td>
+                                        <td>
+                                            @foreach (var rol in usuario.Roles)
+                                            {
+                                                <span class="badge bg-secondary me-1">@rol</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (usuario.Activo)
+                                            {
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-check"></i> Activo
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger">
+                                                    <i class="fas fa-times"></i> Inactivo
+                                                </span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (usuario.IsLockedOut)
+                                            {
+                                                <span class="badge bg-warning text-dark">
+                                                    <i class="fas fa-lock"></i> Bloqueado
+                                                </span>
+                                                @if (usuario.LockoutEnd.HasValue)
+                                                {
+                                                    <div class="small text-muted">@usuario.LockoutEnd.Value.ToString("dd/MM/yyyy HH:mm")</div>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">Sin bloqueo</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <small>@usuario.FechaRegistro.ToString("dd/MM/yyyy")</small>
+                                        </td>
+                                        <td>
+                                            @if (usuario.UltimoAcceso.HasValue)
+                                            {
+                                                <small>@usuario.UltimoAcceso.Value.ToString("dd/MM/yyyy HH:mm")</small>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Nunca</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a asp-action="Details" asp-route-id="@usuario.Id" 
+                                                   class="btn btn-outline-info" title="Ver detalles">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a asp-action="Edit" asp-route-id="@usuario.Id" 
+                                                   class="btn btn-outline-warning" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a asp-action="CambiarPassword" asp-route-id="@usuario.Id" 
+                                                   class="btn btn-outline-primary" title="Cambiar contraseña">
+                                                    <i class="fas fa-key"></i>
+                                                </a>
+                                                @if (usuario.IsLockedOut)
+                                                {
+                                                    <form asp-action="Desbloquear" method="post" class="d-inline">
+                                                        <input type="hidden" name="id" value="@usuario.Id" />
+                                                        <button type="submit" class="btn btn-outline-success"
+                                                                title="Desbloquear"
+                                                                onclick="return confirm('¿Desbloquear este usuario?')">
+                                                            <i class="fas fa-unlock"></i>
+                                                        </button>
+                                                    </form>
+                                                }
+                                                @if (usuario.Activo)
+                                                {
+                                                    <form asp-action="DarDeBaja" method="post" class="d-inline">
+                                                        <input type="hidden" name="id" value="@usuario.Id" />
+                                                        <button type="submit" class="btn btn-outline-danger" 
+                                                                title="Dar de baja" 
+                                                                onclick="return confirm('¿Está seguro de dar de baja este usuario?')">
+                                                            <i class="fas fa-user-times"></i>
+                                                        </button>
+                                                    </form>
+                                                }
+                                                else
+                                                {
+                                                    <form asp-action="Reactivar" method="post" class="d-inline">
+                                                        <input type="hidden" name="id" value="@usuario.Id" />
+                                                        <button type="submit" class="btn btn-outline-success" 
+                                                                title="Reactivar" 
+                                                                onclick="return confirm('¿Está seguro de reactivar este usuario?')">
+                                                            <i class="fas fa-user-check"></i>
+                                                        </button>
+                                                    </form>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Paginación -->
+                    @if (Model.TotalPaginas > 1)
+                    {
+                        <nav aria-label="Paginación de usuarios">
+                            <ul class="pagination justify-content-center">
+                                @if (Model.PaginaActual > 1)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" asp-action="Index" 
+                                           asp-route-pagina="@(Model.PaginaActual - 1)"
+                                           asp-route-Buscar="@Model.Filtros.Buscar"
+                                           asp-route-RolFiltro="@Model.Filtros.RolFiltro"
+                                           asp-route-IdDepartamentoFiltro="@Model.Filtros.IdDepartamentoFiltro"
+                                           asp-route-ActivoFiltro="@Model.Filtros.ActivoFiltro"
+                                           asp-route-EmailConfirmedFiltro="@Model.Filtros.EmailConfirmedFiltro">
+                                            Anterior
+                                        </a>
+                                    </li>
+                                }
+
+                                @for (int i = Math.Max(1, Model.PaginaActual - 2); i <= Math.Min(Model.TotalPaginas, Model.PaginaActual + 2); i++)
+                                {
+                                    <li class="page-item @(i == Model.PaginaActual ? "active" : "")">
+                                        <a class="page-link" asp-action="Index" 
+                                           asp-route-pagina="@i"
+                                           asp-route-Buscar="@Model.Filtros.Buscar"
+                                           asp-route-RolFiltro="@Model.Filtros.RolFiltro"
+                                           asp-route-IdDepartamentoFiltro="@Model.Filtros.IdDepartamentoFiltro"
+                                           asp-route-ActivoFiltro="@Model.Filtros.ActivoFiltro"
+                                           asp-route-EmailConfirmedFiltro="@Model.Filtros.EmailConfirmedFiltro">
+                                            @i
+                                        </a>
+                                    </li>
+                                }
+
+                                @if (Model.PaginaActual < Model.TotalPaginas)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" asp-action="Index" 
+                                           asp-route-pagina="@(Model.PaginaActual + 1)"
+                                           asp-route-Buscar="@Model.Filtros.Buscar"
+                                           asp-route-RolFiltro="@Model.Filtros.RolFiltro"
+                                           asp-route-IdDepartamentoFiltro="@Model.Filtros.IdDepartamentoFiltro"
+                                           asp-route-ActivoFiltro="@Model.Filtros.ActivoFiltro"
+                                           asp-route-EmailConfirmedFiltro="@Model.Filtros.EmailConfirmedFiltro">
+                                            Siguiente
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </nav>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Inicializar tabla con DataTables si está disponible
+        $(document).ready(function() {
+            if ($.fn.DataTable) {
+                $('#usuariosTable').DataTable({
+                    "language": {
+                        "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Spanish.json"
+                    },
+                    "pageLength": 10,
+                    "order": [[0, "asc"]],
+                    "paging": false, // Deshabilitar paginación de DataTables ya que usamos paginación del servidor
+                    "info": false
+                });
+            }
+        });
+    </script>
+}

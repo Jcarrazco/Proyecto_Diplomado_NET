@@ -1,0 +1,237 @@
+@model IndigoAssistMVC.ViewModels.UsuarioViewModel
+@{
+    ViewData["Title"] = $"Detalles - {Model.NombreCompleto}";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2><i class="fas fa-user"></i> Detalles del Usuario</h2>
+                <div class="btn-group" role="group">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                        <i class="fas fa-edit"></i> Editar
+                    </a>
+                    <a asp-action="CambiarPassword" asp-route-id="@Model.Id" class="btn btn-primary">
+                        <i class="fas fa-key"></i> Cambiar Contraseña
+                    </a>
+                    <a asp-action="Dashboard" class="btn btn-info">
+                        <i class="fas fa-chart-line"></i> Dashboard
+                    </a>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Información Principal -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> Información Personal</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <dl class="row">
+                                <dt class="col-sm-4">ID Usuario:</dt>
+                                <dd class="col-sm-8">@Model.Id</dd>
+                                
+                                <dt class="col-sm-4">Usuario:</dt>
+                                <dd class="col-sm-8">
+                                    <strong>@Model.UserName</strong>
+                                </dd>
+                                
+                                <dt class="col-sm-4">Nombre Completo:</dt>
+                                <dd class="col-sm-8">@Model.NombreCompleto</dd>
+                                
+                                <dt class="col-sm-4">Email:</dt>
+                                <dd class="col-sm-8">
+                                    @if (!string.IsNullOrEmpty(Model.Email))
+                                    {
+                                        <a href="mailto:@Model.Email" class="text-decoration-none">
+                                            <i class="fas fa-envelope"></i> @Model.Email
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Sin email registrado</span>
+                                    }
+                                </dd>
+                            </dl>
+                        </div>
+                        <div class="col-md-6">
+                            <dl class="row">
+                                <dt class="col-sm-4">Departamento:</dt>
+                                <dd class="col-sm-8">
+                                    <span class="badge bg-info fs-6">@Model.DepartamentoNombre</span>
+                                </dd>
+                                
+                                <dt class="col-sm-4">Estado:</dt>
+                                <dd class="col-sm-8">
+                                    @if (Model.Activo)
+                                    {
+                                        <span class="badge bg-success fs-6">
+                                            <i class="fas fa-check"></i> Activo
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger fs-6">
+                                            <i class="fas fa-times"></i> Inactivo
+                                        </span>
+                                    }
+                                </dd>
+                                
+                                <dt class="col-sm-4">Email Confirmado:</dt>
+                                <dd class="col-sm-8">
+                                    @if (Model.EmailConfirmed)
+                                    {
+                                        <span class="badge bg-success fs-6">
+                                            <i class="fas fa-check"></i> Confirmado
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning fs-6">
+                                            <i class="fas fa-exclamation"></i> Sin confirmar
+                                        </span>
+                                    }
+                                </dd>
+                                
+                                <dt class="col-sm-4">Fecha Registro:</dt>
+                                <dd class="col-sm-8">@Model.FechaRegistro.ToString("dd/MM/yyyy HH:mm")</dd>
+                                
+                                <dt class="col-sm-4">Último Acceso:</dt>
+                                <dd class="col-sm-8">
+                                    @if (Model.UltimoAcceso.HasValue)
+                                    {
+                                        @Model.UltimoAcceso.Value.ToString("dd/MM/yyyy HH:mm")
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Nunca</span>
+                                    }
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Roles y Acciones -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-user-tag"></i> Roles Asignados</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.Roles.Any())
+                    {
+                        @foreach (var rol in Model.Roles)
+                        {
+                            <span class="badge bg-secondary me-1 mb-1">@rol</span>
+                        }
+                    }
+                    else
+                    {
+                        <span class="text-muted">Sin roles asignados</span>
+                    }
+                </div>
+            </div>
+
+            <!-- Acciones Rápidas -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-tools"></i> Acciones Rápidas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-warning btn-sm">
+                            <i class="fas fa-edit"></i> Editar Usuario
+                        </a>
+                        <a asp-action="CambiarPassword" asp-route-id="@Model.Id" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-key"></i> Cambiar Contraseña
+                        </a>
+                        @if (Model.Activo)
+                        {
+                            <form asp-action="DarDeBaja" method="post" class="d-inline">
+                                <input type="hidden" name="id" value="@Model.Id" />
+                                <button type="submit" class="btn btn-outline-danger btn-sm w-100" 
+                                        onclick="return confirm('¿Está seguro de dar de baja este usuario?')">
+                                    <i class="fas fa-user-times"></i> Dar de Baja
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-action="Reactivar" method="post" class="d-inline">
+                                <input type="hidden" name="id" value="@Model.Id" />
+                                <button type="submit" class="btn btn-outline-success btn-sm w-100" 
+                                        onclick="return confirm('¿Está seguro de reactivar este usuario?')">
+                                    <i class="fas fa-user-check"></i> Reactivar
+                                </button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información del Sistema -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> Información del Sistema</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Nota:</strong> Este usuario está gestionado por ASP.NET Core Identity. 
+                        Los datos se almacenan en la base de datos y se pueden modificar desde esta interfaz.
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Información Técnica:</h6>
+                            <ul class="list-unstyled">
+                                <li><strong>ID:</strong> @Model.Id</li>
+                                <li><strong>Usuario:</strong> @Model.UserName</li>
+                                <li><strong>Email:</strong> @Model.Email</li>
+                                <li><strong>Email Confirmado:</strong> @(Model.EmailConfirmed ? "Sí" : "No")</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Estadísticas:</h6>
+                            <ul class="list-unstyled">
+                                <li><strong>Fecha de Registro:</strong> @Model.FechaRegistro.ToString("dd/MM/yyyy HH:mm")</li>
+                                <li><strong>Último Acceso:</strong> @(Model.UltimoAcceso?.ToString("dd/MM/yyyy HH:mm") ?? "Nunca")</li>
+                                <li><strong>Estado:</strong> @(Model.Activo ? "Activo" : "Inactivo")</li>
+                                <li><strong>Roles:</strong> @Model.Roles.Count</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Animaciones para las tarjetas
+        $(document).ready(function() {
+            $('.card').hover(
+                function() { $(this).addClass('shadow-lg'); },
+                function() { $(this).removeClass('shadow-lg'); }
+            );
+        });
+    </script>
+}

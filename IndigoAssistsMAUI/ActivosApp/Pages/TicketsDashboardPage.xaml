@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ActivosApp.Pages.TicketsDashboardPage"
+             x:Name="TicketsDashboardRoot"
+             Title="Tickets">
+    <Grid RowDefinitions="Auto,Auto,*" Padding="12" RowSpacing="12">
+        <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="8">
+            <Button x:Name="AbiertosDeptoTabButton"
+                    Grid.Column="0"
+                    Text="Abiertos Depto"
+                    Clicked="OnTabClicked"
+                    CommandParameter="AbiertosDepto" />
+            <Button x:Name="EnProcesoDeptoTabButton"
+                    Grid.Column="1"
+                    Text="En Proceso Depto"
+                    Clicked="OnTabClicked"
+                    CommandParameter="EnProcesoDepto" />
+            <Button x:Name="AbiertosMiosTabButton"
+                    Grid.Column="2"
+                    Text="Abiertos Mios"
+                    Clicked="OnTabClicked"
+                    CommandParameter="AbiertosMios" />
+            <Button x:Name="EnProcesoMiosTabButton"
+                    Grid.Column="3"
+                    Text="En Proceso Mios"
+                    Clicked="OnTabClicked"
+                    CommandParameter="EnProcesoMios" />
+        </Grid>
+
+        <ActivityIndicator Grid.Row="1"
+                           IsVisible="{Binding Source={x:Reference TicketsDashboardRoot}, Path=IsLoading}"
+                           IsRunning="{Binding Source={x:Reference TicketsDashboardRoot}, Path=IsLoading}"
+                           HorizontalOptions="Center" />
+
+        <Grid Grid.Row="2">
+            <CollectionView x:Name="AbiertosDeptoCollection"
+                            IsVisible="False"
+                            SelectionMode="Single"
+                            SelectionChanged="OnTicketSelected">
+                <CollectionView.EmptyView>
+                    <Label Text="Sin tickets" TextColor="#6B7280" />
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Margin="0,6" Padding="12" Stroke="#E5E7EB" StrokeThickness="1">
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="{Binding IdTicket, StringFormat='Ticket: {0}'}" FontAttributes="Bold" />
+                                <Label Text="{Binding Titulo}" />
+                                <Label Text="{Binding StatusDescripcion}" FontSize="12" TextColor="#6B7280" />
+                                <Label Text="{Binding DepartamentoNombre}" FontSize="12" TextColor="#6B7280" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <CollectionView x:Name="EnProcesoDeptoCollection"
+                            IsVisible="False"
+                            SelectionMode="Single"
+                            SelectionChanged="OnTicketSelected">
+                <CollectionView.EmptyView>
+                    <Label Text="Sin tickets" TextColor="#6B7280" />
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Margin="0,6" Padding="12" Stroke="#E5E7EB" StrokeThickness="1">
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="{Binding IdTicket, StringFormat='Ticket: {0}'}" FontAttributes="Bold" />
+                                <Label Text="{Binding Titulo}" />
+                                <Label Text="{Binding StatusDescripcion}" FontSize="12" TextColor="#6B7280" />
+                                <Label Text="{Binding TecnicoNombre}" FontSize="12" TextColor="#6B7280" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <CollectionView x:Name="AbiertosMiosCollection"
+                            IsVisible="False"
+                            SelectionMode="Single"
+                            SelectionChanged="OnTicketSelected">
+                <CollectionView.EmptyView>
+                    <Label Text="Sin tickets" TextColor="#6B7280" />
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Margin="0,6" Padding="12" Stroke="#E5E7EB" StrokeThickness="1">
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="{Binding IdTicket, StringFormat='Ticket: {0}'}" FontAttributes="Bold" />
+                                <Label Text="{Binding Titulo}" />
+                                <Label Text="{Binding StatusDescripcion}" FontSize="12" TextColor="#6B7280" />
+                                <Label Text="{Binding DepartamentoNombre}" FontSize="12" TextColor="#6B7280" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <CollectionView x:Name="EnProcesoMiosCollection"
+                            IsVisible="False"
+                            SelectionMode="Single"
+                            SelectionChanged="OnTicketSelected">
+                <CollectionView.EmptyView>
+                    <Label Text="Sin tickets" TextColor="#6B7280" />
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Margin="0,6" Padding="12" Stroke="#E5E7EB" StrokeThickness="1">
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="{Binding IdTicket, StringFormat='Ticket: {0}'}" FontAttributes="Bold" />
+                                <Label Text="{Binding Titulo}" />
+                                <Label Text="{Binding StatusDescripcion}" FontSize="12" TextColor="#6B7280" />
+                                <Label Text="{Binding TecnicoNombre}" FontSize="12" TextColor="#6B7280" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+    </Grid>
+</ContentPage>

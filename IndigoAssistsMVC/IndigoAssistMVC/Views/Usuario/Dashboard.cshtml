@@ -1,0 +1,312 @@
+@model IndigoAssistMVC.ViewModels.UsuarioDashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard de Usuarios";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-chart-line"></i> Dashboard de Usuarios</h2>
+                <div class="btn-group" role="group">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver a Usuarios
+                    </a>
+                    <a asp-action="Create" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Nuevo Usuario
+                    </a>
+                </div>
+            </div>
+
+            <!-- Filtros de búsqueda -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-filter"></i> Filtros de Búsqueda</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" asp-action="Dashboard">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label asp-for="Filtros.Buscar" class="form-label">Buscar</label>
+                                <input asp-for="Filtros.Buscar" class="form-control" placeholder="Usuario, nombre o email..." />
+                            </div>
+                            <div class="col-md-2">
+                                <label asp-for="Filtros.RolFiltro" class="form-label">Rol</label>
+                                <select asp-for="Filtros.RolFiltro" class="form-select">
+                                    <option value="">Todos los roles</option>
+                                    @foreach (var rol in Model.Filtros.RolesDisponibles)
+                                    {
+                                        <option value="@rol.Name">@rol.Name</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label asp-for="Filtros.IdDepartamentoFiltro" class="form-label">Departamento</label>
+                                <select asp-for="Filtros.IdDepartamentoFiltro" class="form-select">
+                                    <option value="">Todos los departamentos</option>
+                                    @foreach (var depto in Model.Filtros.DepartamentosDisponibles)
+                                    {
+                                        <option value="@depto.IdDepartamento">@depto.Nombre</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label asp-for="Filtros.ActivoFiltro" class="form-label">Estado</label>
+                                <select asp-for="Filtros.ActivoFiltro" class="form-select">
+                                    <option value="">Todos</option>
+                                    <option value="true">Activos</option>
+                                    <option value="false">Inactivos</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label asp-for="Filtros.EmailConfirmedFiltro" class="form-label">Email</label>
+                                <select asp-for="Filtros.EmailConfirmedFiltro" class="form-select">
+                                    <option value="">Todos</option>
+                                    <option value="true">Confirmados</option>
+                                    <option value="false">Sin confirmar</option>
+                                </select>
+                            </div>
+                            <div class="col-md-1 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                                <a asp-action="Dashboard" class="btn btn-secondary ms-1">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Estadísticas principales -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4>@Model.TotalUsuarios</h4>
+                                    <p class="mb-0">Total Usuarios</p>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-users fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4>@Model.UsuariosActivos</h4>
+                                    <p class="mb-0">Usuarios Activos</p>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-user-check fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-danger text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4>@Model.UsuariosInactivos</h4>
+                                    <p class="mb-0">Usuarios Inactivos</p>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-user-times fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4>@Model.Usuarios.Count(u => u.EmailConfirmed)</h4>
+                                    <p class="mb-0">Emails Confirmados</p>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-envelope fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Distribución por roles -->
+            @if (Model.UsuariosPorRol.Any())
+            {
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Distribución por Roles</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    @foreach (var rol in Model.UsuariosPorRol)
+                                    {
+                                        <div class="col-md-3 col-sm-6 mb-3">
+                                            <div class="card text-center">
+                                                <div class="card-body">
+                                                    <h4 class="card-title text-primary">@rol.Value</h4>
+                                                    <p class="card-text text-muted">@rol.Key</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Lista de usuarios filtrados -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-table"></i> Usuarios (@Model.Usuarios.Count)</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.Usuarios.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="usuariosTable">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Usuario</th>
+                                        <th>Nombre Completo</th>
+                                        <th>Email</th>
+                                        <th>Departamento</th>
+                                        <th>Roles</th>
+                                        <th>Estado</th>
+                                        <th>Fecha Registro</th>
+                                        <th>Último Acceso</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var usuario in Model.Usuarios)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong>@usuario.UserName</strong>
+                                            </td>
+                                            <td>@usuario.NombreCompleto</td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(usuario.Email))
+                                                {
+                                                    <a href="mailto:@usuario.Email" class="text-decoration-none">
+                                                        <i class="fas fa-envelope"></i> @usuario.Email
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Sin email</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">@usuario.DepartamentoNombre</span>
+                                            </td>
+                                            <td>
+                                                @foreach (var rol in usuario.Roles)
+                                                {
+                                                    <span class="badge bg-secondary me-1">@rol</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (usuario.Activo)
+                                                {
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-check"></i> Activo
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-danger">
+                                                        <i class="fas fa-times"></i> Inactivo
+                                                    </span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <small>@usuario.FechaRegistro.ToString("dd/MM/yyyy")</small>
+                                            </td>
+                                            <td>
+                                                @if (usuario.UltimoAcceso.HasValue)
+                                                {
+                                                    <small>@usuario.UltimoAcceso.Value.ToString("dd/MM/yyyy HH:mm")</small>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Nunca</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <a asp-action="Details" asp-route-id="@usuario.Id" 
+                                                       class="btn btn-outline-info" title="Ver detalles">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a asp-action="Edit" asp-route-id="@usuario.Id" 
+                                                       class="btn btn-outline-warning" title="Editar">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a asp-action="CambiarPassword" asp-route-id="@usuario.Id" 
+                                                       class="btn btn-outline-primary" title="Cambiar contraseña">
+                                                        <i class="fas fa-key"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info text-center">
+                            <i class="fas fa-info-circle fa-2x mb-3"></i>
+                            <h5>No se encontraron usuarios</h5>
+                            <p>No hay usuarios que coincidan con los filtros aplicados.</p>
+                            <a asp-action="Dashboard" class="btn btn-primary">Limpiar Filtros</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Inicializar tabla con DataTables si está disponible
+        $(document).ready(function() {
+            if ($.fn.DataTable && $('#usuariosTable').length) {
+                $('#usuariosTable').DataTable({
+                    "language": {
+                        "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Spanish.json"
+                    },
+                    "pageLength": 10,
+                    "order": [[0, "asc"]]
+                });
+            }
+
+            // Animaciones para las tarjetas
+            $('.card').hover(
+                function() { $(this).addClass('shadow-lg'); },
+                function() { $(this).removeClass('shadow-lg'); }
+            );
+        });
+    </script>
+}

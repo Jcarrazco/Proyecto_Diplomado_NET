@@ -1,0 +1,396 @@
+@model IndigoAssistMVC.ViewModels.ActivoViewModel
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Detalles del Activo";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var currencyCulture = CultureInfo.GetCultureInfo("es-MX");
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="display-6 text-info">
+                        <i class="fas fa-eye me-2"></i>
+                        Detalles del Activo
+                    </h1>
+                    <p class="text-muted">Información completa del activo <strong>@Model.Codigo</strong></p>
+                </div>
+                <div class="btn-group">
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        Volver al Listado
+                    </a>
+                    <a asp-action="Edit" asp-route-id="@Model.IdActivo" class="btn btn-warning">
+                        Editar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-11 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-laptop me-2"></i>
+                        @Model.Nombre - ID: @Model.IdActivo
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Información Básica -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-secondary border-bottom pb-2 mb-3">
+                                Información Básica
+                            </h6>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <dt class="text-muted">@Html.DisplayNameFor(model => model.Codigo)</dt>
+                            <dd class="h5">
+                                <code class="bg-light px-3 py-2 rounded">@Html.DisplayFor(model => model.Codigo)</code>
+                            </dd>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <dt class="text-muted">@Html.DisplayNameFor(model => model.Nombre)</dt>
+                            <dd class="h6 text-dark">@Html.DisplayFor(model => model.Nombre)</dd>
+                        </div>
+                    </div>
+
+                    <!-- Especificaciones Técnicas -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-secondary border-bottom pb-2 mb-3">
+                                Especificaciones Técnicas
+                            </h6>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <dt class="text-muted">@Html.DisplayNameFor(model => model.Marca)</dt>
+                            <dd class="fw-medium">
+                                @if (!string.IsNullOrEmpty(Model.Marca))
+                                {
+                                    <span class="badge bg-secondary">@Html.DisplayFor(model => model.Marca)</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">No especificada</span>
+                                }
+                            </dd>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <dt class="text-muted">@Html.DisplayNameFor(model => model.Modelo)</dt>
+                            <dd class="fw-medium">
+                                @if (!string.IsNullOrEmpty(Model.Modelo))
+                                {
+                                    @Html.DisplayFor(model => model.Modelo)
+                                }
+                                else
+                                {
+                                    <span class="text-muted">No especificado</span>
+                                }
+                            </dd>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <dt class="text-muted">@Html.DisplayNameFor(model => model.Serie)</dt>
+                            <dd class="fw-medium">
+                                @if (!string.IsNullOrEmpty(Model.Serie))
+                                {
+                                    <code class="text-primary">@Html.DisplayFor(model => model.Serie)</code>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">No especificado</span>
+                                }
+                            </dd>
+                        </div>
+                    </div>
+
+                    <!-- Clasificación -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-secondary border-bottom pb-2 mb-3">
+                                Clasificación
+                            </h6>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <dt class="text-muted">@Html.DisplayNameFor(model => model.IdTipoActivo)</dt>
+                            <dd>
+                                <span class="badge bg-primary">@(Model.TipoActivoNombre ?? "No especificado")</span>
+                            </dd>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <dt class="text-muted">@Html.DisplayNameFor(model => model.IdDepartamento)</dt>
+                            <dd>
+                                <span class="badge bg-success">@(Model.DepartamentoNombre ?? "No especificado")</span>
+                            </dd>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <dt class="text-muted">@Html.DisplayNameFor(model => model.IdStatus)</dt>
+                            <dd>
+                                <span class="badge bg-info">@(Model.StatusNombre)</span>
+                            </dd>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <dt class="text-muted">@Html.DisplayNameFor(model => model.IdProveedor)</dt>
+                            <dd>
+                                <span class="badge bg-warning text-dark">@(Model.ProveedorNombre ?? "No especificado")</span>
+                            </dd>
+                        </div>
+                    </div>
+
+                    <!-- Asignación y Ubicación -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-secondary border-bottom pb-2 mb-3">
+                                Asignación y Ubicación
+                            </h6>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <dt class="text-muted">@Html.DisplayNameFor(model => model.PersonaAsign)</dt>
+                            <dd class="fw-medium">
+                                @if (!string.IsNullOrEmpty(Model.PersonaAsign))
+                                {
+                                    @Html.DisplayFor(model => model.PersonaAsign)
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Sin asignar</span>
+                                }
+                            </dd>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <dt class="text-muted">@Html.DisplayNameFor(model => model.Ubicacion)</dt>
+                            <dd class="fw-medium">
+                                @if (!string.IsNullOrEmpty(Model.Ubicacion))
+                                {
+                                    @Html.DisplayFor(model => model.Ubicacion)
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Sin ubicación definida</span>
+                                }
+                            </dd>
+                        </div>
+                    </div>
+
+                    <!-- Fechas Importantes -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-secondary border-bottom pb-2 mb-3">
+                                Fechas Importantes
+                            </h6>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <dt class="text-muted">@Html.DisplayNameFor(model => model.FeAlta)</dt>
+                            <dd class="fw-medium">
+                                @Html.DisplayFor(model => model.FeAlta)
+                            </dd>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <dt class="text-muted">@Html.DisplayNameFor(model => model.FeCompra)</dt>
+                            <dd class="fw-medium">
+                                @if (Model.FeCompra.HasValue)
+                                {
+                                    @Html.DisplayFor(model => model.FeCompra)
+                                }
+                                else
+                                {
+                                    <span class="text-muted">No especificada</span>
+                                }
+                            </dd>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <dt class="text-muted">@Html.DisplayNameFor(model => model.FeBaja)</dt>
+                            <dd class="fw-medium">
+                                @if (Model.FeBaja.HasValue)
+                                {
+                                    @Html.DisplayFor(model => model.FeBaja)
+                                }
+                                else
+                                {
+                                    <span class="text-success">Activo en operación</span>
+                                }
+                            </dd>
+                        </div>
+                    </div>
+
+                    <!-- Información Financiera y Técnica -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-secondary border-bottom pb-2 mb-3">
+                                Información Adicional
+                            </h6>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <dt class="text-muted">@Html.DisplayNameFor(model => model.CostoCompra)</dt>
+                            <dd class="h5">
+                                @if (Model.CostoCompra.HasValue)
+                                {
+                                    <span class="text-success fw-bold">@Model.CostoCompra.Value.ToString("C", currencyCulture)</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">No especificado</span>
+                                }
+                            </dd>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <dt class="text-muted">@Html.DisplayNameFor(model => model.TieneSoftwareOP)</dt>
+                            <dd>
+                                @if (Model.TieneSoftwareOP)
+                                {
+                                    <span class="badge bg-success">
+                                        Sí tiene
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">
+                                        No tiene
+                                    </span>
+                                }
+                            </dd>
+                        </div>
+                    </div>
+
+                    <!-- Componentes -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-secondary border-bottom pb-2 mb-3">
+                                Componentes
+                            </h6>
+                            <dt class="text-muted">@Html.DisplayNameFor(model => model.CodificacionComponentes)</dt>
+                            <dd>
+                                @if (Model.CodificacionComponentes.HasValue && Model.CodificacionComponentes.Value > 0 && Model.ComponentesDisponibles != null)
+                                {
+                                    var componentesSeleccionados = Model.GetComponentesSeleccionadosNames(Model.ComponentesDisponibles);
+                                    @if (componentesSeleccionados.Any())
+                                    {
+                                        @foreach (var componente in componentesSeleccionados)
+                                        {
+                                            <span class="badge bg-light text-dark me-1 mb-1">
+                                                @componente
+                                            </span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Sin componentes especificados</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Sin componentes especificados</span>
+                                }
+                            </dd>
+                        </div>
+                    </div>
+
+                    <!-- Notas -->
+                    @if (!string.IsNullOrEmpty(Model.Notas))
+                    {
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-secondary border-bottom pb-2 mb-3">
+                                    Notas y Observaciones
+                                </h6>
+                                <div class="alert alert-light border-start border-info border-4">
+                                    <p class="mb-0">@Html.DisplayFor(model => model.Notas)</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Botones de Acción -->
+                    <div class="row">
+                        <div class="col-12">
+                            <hr class="mb-4">
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                                <a asp-action="Index" class="btn btn-outline-secondary me-2">
+                                    Volver al Listado
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@Model.IdActivo" class="btn btn-warning me-2">
+                                    Editar Activo
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@Model.IdActivo" class="btn btn-outline-danger">
+                                    Eliminar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Agregar Font Awesome si no está incluido -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<style>
+    .card {
+        border: none;
+        border-radius: 15px;
+    }
+    
+    .card-header {
+        border-radius: 15px 15px 0 0 !important;
+    }
+    
+    .btn {
+        border-radius: 8px;
+        transition: all 0.2s ease-in-out;
+    }
+    
+    .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .badge {
+        font-size: 0.875rem;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    dt {
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+    
+    dd {
+        margin-bottom: 0.75rem;
+        font-size: 1rem;
+    }
+    
+    code {
+        font-size: 1rem;
+        color: #6f42c1;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .display-6 {
+        font-weight: 600;
+    }
+    
+    .border-start {
+        border-left-width: 4px !important;
+    }
+    
+    .alert-light {
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+    }
+    
+    /* Animaciones suaves */
+    .badge, .btn, .alert {
+        transition: all 0.3s ease;
+    }
+    
+    .badge:hover {
+        transform: scale(1.05);
+    }
+    
+</style>

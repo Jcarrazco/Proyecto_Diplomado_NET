@@ -1,0 +1,376 @@
+﻿@model IndigoAssistMVC.ViewModels.ActivoIndexViewModel
+@using IndigoAssistMVC.ViewModels
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Listado de Activos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var currencyCulture = CultureInfo.GetCultureInfo("es-MX");
+    var isFilterMode = string.Equals(Context.Request.Query["mode"], "filter", StringComparison.OrdinalIgnoreCase);
+    var filtro = Model?.Filtro;
+    var isFilterActive = filtro != null && (
+        isFilterMode ||
+        filtro.IdActivo.HasValue ||
+        !string.IsNullOrWhiteSpace(filtro.CodigoLike) ||
+        !string.IsNullOrWhiteSpace(filtro.MarcaLike) ||
+        !string.IsNullOrWhiteSpace(filtro.NombreLike) ||
+        !string.IsNullOrWhiteSpace(filtro.PersonaAsignLike) ||
+        !string.IsNullOrWhiteSpace(filtro.UbicacionLike) ||
+        filtro.TipoActivoId.HasValue ||
+        filtro.DepartamentoId.HasValue ||
+        filtro.StatusId.HasValue ||
+        filtro.ProveedorId.HasValue ||
+        filtro.TieneSoftwareOP.HasValue ||
+        filtro.CostoMin.HasValue ||
+        filtro.CostoMax.HasValue ||
+        filtro.FechaTarget != ActivoFiltroViewModel.DateTarget.None ||
+        filtro.FechaAltaDesde.HasValue ||
+        filtro.FechaAltaHasta.HasValue ||
+        filtro.FechaCompraDesde.HasValue ||
+        filtro.FechaCompraHasta.HasValue ||
+        filtro.FechaBajaDesde.HasValue ||
+        filtro.FechaBajaHasta.HasValue ||
+        (filtro.ComponentesSeleccionados != null && filtro.ComponentesSeleccionados.Any())
+    );
+}
+
+<div class="row g-3">
+    <!-- Filtro -->
+    <div class="col-12 col-xl-3">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Filtro</span>
+                <button id="activo-filtro-toggle" class="btn btn-sm btn-outline-secondary" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#activo-filtro" aria-expanded="@(isFilterActive ? "true" : "false")">
+                    @(isFilterActive ? "Ocultar" : "Mostrar")
+                </button>
+            </div>
+            <div id="activo-filtro" class="collapse @(isFilterActive ? "show" : "")">
+                <div class="card-body">
+                <form method="get" class="vstack gap-3">
+                    <input type="hidden" name="mode" value="filter" />
+
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label asp-for="Filtro.IdActivo" class="form-label"></label>
+                            <input asp-for="Filtro.IdActivo" class="form-control" />
+                        </div>
+                        <div class="col-6">
+                            <label asp-for="Filtro.CodigoLike" class="form-label"></label>
+                            <input asp-for="Filtro.CodigoLike" class="form-control" placeholder="Contiene…" />
+                        </div>
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label asp-for="Filtro.MarcaLike" class="form-label"></label>
+                            <input asp-for="Filtro.MarcaLike" class="form-control" placeholder="Contiene…" />
+                        </div>
+                        <div class="col-6">
+                            <label asp-for="Filtro.NombreLike" class="form-label"></label>
+                            <input asp-for="Filtro.NombreLike" class="form-control" placeholder="Contiene…" />
+                        </div>
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label asp-for="Filtro.PersonaAsignLike" class="form-label"></label>
+                            <input asp-for="Filtro.PersonaAsignLike" class="form-control" placeholder="Contiene…" />
+                        </div>
+                        <div class="col-6">
+                            <label asp-for="Filtro.UbicacionLike" class="form-label"></label>
+                            <input asp-for="Filtro.UbicacionLike" class="form-control" placeholder="Contiene…" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label asp-for="Filtro.TipoActivoId" class="form-label"></label>
+                        <select asp-for="Filtro.TipoActivoId" asp-items="Model.Filtro.TiposActivo" class="form-select">
+                            <option value="">(Todos)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label asp-for="Filtro.DepartamentoId" class="form-label"></label>
+                        <select asp-for="Filtro.DepartamentoId" asp-items="Model.Filtro.Departamentos" class="form-select">
+                            <option value="">(Todos)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label asp-for="Filtro.StatusId" class="form-label"></label>
+                        <select asp-for="Filtro.StatusId" asp-items="Model.Filtro.Statuses" class="form-select">
+                            <option value="">(Todos)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label asp-for="Filtro.ProveedorId" class="form-label"></label>
+                        <select asp-for="Filtro.ProveedorId" asp-items="Model.Filtro.Proveedores" class="form-select">
+                            <option value="">(Todos)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox"
+                               id="aplicaSoftware"
+                               onchange="document.getElementById('softwareVal').disabled=!this.checked;"
+                               @(Model.Filtro.TieneSoftwareOP.HasValue ? "checked" : null) />
+                        <label class="form-check-label" for="aplicaSoftware">Aplicar Sistema Operativo</label>
+                    </div>
+                    <div>
+                        <input id="softwareVal" name="Filtro.TieneSoftwareOP" type="checkbox" class="form-check-input"
+                               value="true"
+                               @(Model.Filtro.TieneSoftwareOP == true ? "checked" : null)
+                               @(Model.Filtro.TieneSoftwareOP.HasValue ? null : "disabled") />
+                        <label class="form-check-label" for="softwareVal">Sólo con Sistema Operativo</label>
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label asp-for="Filtro.CostoMin" class="form-label"></label>
+                            <input asp-for="Filtro.CostoMin" class="form-control" />
+                        </div>
+                        <div class="col-6">
+                            <label asp-for="Filtro.CostoMax" class="form-label"></label>
+                            <input asp-for="Filtro.CostoMax" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="form-label d-block">Rango de Fecha</label>
+                        <div class="mb-2">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="Filtro.FechaTarget" value="None"
+                                       @(Model.Filtro.FechaTarget == ActivoFiltroViewModel.DateTarget.None ? "checked" : null) />
+                                <label class="form-check-label">Ninguna</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="Filtro.FechaTarget" value="FechaAlta"
+                                       @(Model.Filtro.FechaTarget == ActivoFiltroViewModel.DateTarget.FechaAlta ? "checked" : null) />
+                                <label class="form-check-label">Fecha de Alta</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="Filtro.FechaTarget" value="FechaCompra"
+                                       @(Model.Filtro.FechaTarget == ActivoFiltroViewModel.DateTarget.FechaCompra ? "checked" : null) />
+                                <label class="form-check-label">Fecha de Compra</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="Filtro.FechaTarget" value="FechaBaja"
+                                       @(Model.Filtro.FechaTarget == ActivoFiltroViewModel.DateTarget.FechaBaja ? "checked" : null) />
+                                <label class="form-check-label">Fecha de Baja</label>
+                            </div>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col">
+                                <label asp-for="Filtro.FechaAltaDesde" class="form-label"></label>
+                                <input asp-for="Filtro.FechaAltaDesde" type="date" class="form-control" />
+                            </div>
+                            <div class="col">
+                                <label asp-for="Filtro.FechaAltaHasta" class="form-label"></label>
+                                <input asp-for="Filtro.FechaAltaHasta" type="date" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col">
+                                <label asp-for="Filtro.FechaCompraDesde" class="form-label"></label>
+                                <input asp-for="Filtro.FechaCompraDesde" type="date" class="form-control" />
+                            </div>
+                            <div class="col">
+                                <label asp-for="Filtro.FechaCompraHasta" class="form-label"></label>
+                                <input asp-for="Filtro.FechaCompraHasta" type="date" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col">
+                                <label asp-for="Filtro.FechaBajaDesde" class="form-label"></label>
+                                <input asp-for="Filtro.FechaBajaDesde" type="date" class="form-control" />
+                            </div>
+                            <div class="col">
+                                <label asp-for="Filtro.FechaBajaHasta" class="form-label"></label>
+                                <input asp-for="Filtro.FechaBajaHasta" type="date" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="form-label">Componentes</label>
+                        <select asp-for="Filtro.ComponentesSeleccionados" asp-items="Model.Filtro.Componentes" class="form-select" multiple size="6"></select>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Aplicar Filtro</button>
+                    </div>
+                </form>
+
+                <form method="get" class="mt-2 d-grid">
+                    <input type="hidden" name="mode" value="all" />
+                    <button class="btn btn-outline-secondary">Mostrar todos</button>
+                </form>
+
+                <a class="btn btn-success mt-3 w-100" asp-action="Create">Crear</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resultados -->
+    <div class="col-12 col-xl-9">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Resultados (@Model.Resultados?.Count() ?? 0)</span>
+            </div>
+            <div class="card-body p-0">
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger m-3" role="alert">
+                        <strong>Error:</strong> @TempData["Error"]
+                    </div>
+                }
+                @if (TempData["Info"] != null)
+                {
+                    <div class="alert alert-info m-3" role="alert">
+                        @TempData["Info"]
+                    </div>
+                }
+                <form method="get" class="m-0 p-0">
+                    <input type="hidden" name="mode" value="filter" />
+                    <!-- Hiddens para conservar filtros al paginar -->
+                    <input type="hidden" name="Filtro.IdActivo" value="@(Model.Filtro.IdActivo)" />
+                    <input type="hidden" name="Filtro.CodigoLike" value="@(Model.Filtro.CodigoLike)" />
+                    <input type="hidden" name="Filtro.MarcaLike" value="@(Model.Filtro.MarcaLike)" />
+                    <input type="hidden" name="Filtro.NombreLike" value="@(Model.Filtro.NombreLike)" />
+                    <input type="hidden" name="Filtro.PersonaAsignLike" value="@(Model.Filtro.PersonaAsignLike)" />
+                    <input type="hidden" name="Filtro.UbicacionLike" value="@(Model.Filtro.UbicacionLike)" />
+                    <input type="hidden" name="Filtro.TipoActivoId" value="@(Model.Filtro.TipoActivoId)" />
+                    <input type="hidden" name="Filtro.DepartamentoId" value="@(Model.Filtro.DepartamentoId)" />
+                    <input type="hidden" name="Filtro.StatusId" value="@(Model.Filtro.StatusId)" />
+                    <input type="hidden" name="Filtro.ProveedorId" value="@(Model.Filtro.ProveedorId)" />
+                    @if (Model.Filtro.TieneSoftwareOP.HasValue)
+                    {
+                        <input type="hidden" name="Filtro.TieneSoftwareOP" value="@(Model.Filtro.TieneSoftwareOP.Value ? "true" : "false")" />
+                    }
+                    <input type="hidden" name="Filtro.CostoMin" value="@(Model.Filtro.CostoMin)" />
+                    <input type="hidden" name="Filtro.CostoMax" value="@(Model.Filtro.CostoMax)" />
+                    <input type="hidden" name="Filtro.FechaTarget" value="@Model.Filtro.FechaTarget" />
+                    <input type="hidden" name="Filtro.FechaAltaDesde" value="@(Model.Filtro.FechaAltaDesde?.ToString("yyyy-MM-dd"))" />
+                    <input type="hidden" name="Filtro.FechaAltaHasta" value="@(Model.Filtro.FechaAltaHasta?.ToString("yyyy-MM-dd"))" />
+                    <input type="hidden" name="Filtro.FechaCompraDesde" value="@(Model.Filtro.FechaCompraDesde?.ToString("yyyy-MM-dd"))" />
+                    <input type="hidden" name="Filtro.FechaCompraHasta" value="@(Model.Filtro.FechaCompraHasta?.ToString("yyyy-MM-dd"))" />
+                    <input type="hidden" name="Filtro.FechaBajaDesde" value="@(Model.Filtro.FechaBajaDesde?.ToString("yyyy-MM-dd"))" />
+                    <input type="hidden" name="Filtro.FechaBajaHasta" value="@(Model.Filtro.FechaBajaHasta?.ToString("yyyy-MM-dd"))" />
+                    @foreach (var c in Model.Filtro.ComponentesSeleccionados)
+                    {
+                        <input type="hidden" name="Filtro.ComponentesSeleccionados" value="@c" />
+                    }
+
+                    <table class="table table-striped table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Código</th>
+                                <th>Marca</th>
+                                <th>Nombre</th>
+                                <th>Tipo</th>
+                                <th>Departamento</th>
+                                <th>Status</th>
+                                <th>Costo</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Resultados is not null)
+                            {
+                                foreach (var item in Model.Resultados)
+                                {
+                                    <tr>
+                                        <td>@item.IdActivo</td>
+                                        <td><code class="bg-light px-2 py-1 rounded">@item.Codigo</code></td>
+                                        <td>@item.Marca</td>
+                                        <td>@item.Nombre</td>
+                                        <td>@item.TipoActivoNombre</td>
+                                        <td>@item.DepartamentoNombre</td>
+                                        <td>@item.StatusNombre</td>
+                                        <td>
+                                            @if (item.CostoCompra.HasValue)
+                                            {
+                                                <span class="text-success fw-bold">@item.CostoCompra.Value.ToString("C", currencyCulture)</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">N/A</span>
+                                            }
+                                        </td>
+                                        <td class="text-nowrap">
+                                            <a class="btn btn-sm btn-outline-secondary" asp-action="Details" asp-route-id="@item.IdActivo">Consultar</a>
+                                            <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@item.IdActivo">Editar</a>
+                                            <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.IdActivo">Borrar</a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border: none;
+        border-radius: 15px;
+    }
+    
+    .card-header {
+        border-radius: 15px 15px 0 0 !important;
+    }
+    
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+    
+    .btn {
+        border-radius: 8px;
+        transition: all 0.2s ease-in-out;
+    }
+    
+    .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .btn-sm {
+        font-size: 0.8rem;
+        padding: 0.375rem 0.75rem;
+    }
+    
+    code {
+        font-size: 0.875rem;
+        color: #6f42c1;
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var filtro = document.getElementById("activo-filtro");
+        var toggle = document.getElementById("activo-filtro-toggle");
+        if (!filtro || !toggle) return;
+
+        filtro.addEventListener("show.bs.collapse", function () {
+            toggle.textContent = "Ocultar";
+        });
+        filtro.addEventListener("hide.bs.collapse", function () {
+            toggle.textContent = "Mostrar";
+        });
+    });
+</script>
