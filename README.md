@@ -24,7 +24,6 @@ flowchart LR
 ```
 
 Notas:
-- La app MAUI consume una API externa (no incluida en este repo) segun `IndigoAssistsMAUI/README.md`.
 - La solucion MVC/API trabaja con la base legacy Indigo y con IndigoBasic para Identity.
 
 ## Modulos principales
